@@ -17,13 +17,8 @@ ForEach ($vm in $vms) {
             
     $Driveletter = "$((Mount-VHD $vhdxpath -Passthru | Get-Disk | Get-Partition | where-object{$_.Type -eq "Basic" }).DriveLetter):"
     $path
-    if (((get-item env:computername).value) -eq "SURFACE") {
-        $path = "C:\Users\coen\OneDrive\scripts\DSC\TestDsc\test"
-    }
-    else {
-        $path = "C:\Users\chodz\OneDrive\scripts\DSC\TestDsc\test"
-    }
-    $path = "C:\Users\chodz\Documenten\GitHub\DSCLabCoen\test"
+    
+    $path = "$((get-item env:userprofile).value)\Documenten\GitHub\DSCLabCoen\test"
     copy-item -Path "$path\$($vm.name).mof" -Destination "$Driveletter\Windows\system32\Configuration\pending.mof"
     copy-item -Path "$path\$($vm.name).meta.mof" -Destination "$Driveletter\Windows\system32\Configuration\MetaConfig.mof"
     foreach ($module in $modules) {
