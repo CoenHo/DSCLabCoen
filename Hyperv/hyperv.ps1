@@ -241,5 +241,6 @@ else {
 switch ((get-item env:computername).value) {
     'LAPTOPCOEN' { xVMHyperV_Complete -ServerBasePath "Z:\VM\Base\WS2019_SE_UEFI.vhdx" -ClientBasePath "Z:\VM\Base\w10_E_1909.vhdx"  -ConfigurationData $ConfigData -OutputPath C:\dsc\hyperv -VmPath "z:\vm" }
     'SURFACE' { xVMHyperV_Complete -ServerBasePath "C:\vm\Base\WS2019_SE_UEFI.vhdx" -ClientBasePath "C:\vm\Base\W10_E_UEFI.vhdx"  -ConfigurationData $ConfigData -OutputPath C:\dsc\hyperv -VmPath "c:\vm" }
-    Default {}
+    'COENPC' { xVMHyperV_Complete -serverbasePath "D:\vm\Base\WS19_SE._UEFI.vhdx" -clientbasepath "D:\vm\Base\W10_E_UEFI.vhdx" -ConfigurationData $ConfigData -OutputPath C:\dsc\hyperv -VmPath "d:\vm" }
+    Default { write-host "PCName is unknown" }
 }
