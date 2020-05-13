@@ -10,6 +10,7 @@
     #Settings for all nodes
     node $AllNodes.Where{ $true }.NodeName
     {
+        
         #region LCM configuration
 
         LocalConfigurationManager {
@@ -33,11 +34,13 @@
             NewName    = 'LAB'
             MacAddress = "$($node.MacAddress)".insert(2, "-").insert(5, "-").insert(8, "-").insert(11, "-").insert(14, "-")
         }
-        if(($node.Nodenaam) -eq 'POSHFS'){
+        write-host $node.NodeName
+        if ($node.Nodename -eq 'POSHFS') {
+            write-host "$($node.MacAddressex)"
             NetAdapterName RenameWanAdapter {
-            NewName    = 'WAN'
-            MacAddress = "$($node.MacAddressex)".insert(2, "-").insert(5, "-").insert(8, "-").insert(11, "-").insert(14, "-")
-        }
+                NewName    = 'WAN'
+                MacAddress = "$($node.MacAddressex)".insert(2, "-").insert(5, "-").insert(8, "-").insert(11, "-").insert(14, "-")
+            }
         }
         If (-not [System.String]::IsNullOrEmpty($node.IPAddress)) {
             IPAddress 'PrimaryIPAddress' {
@@ -48,10 +51,12 @@
             }
         }
         If (-not [System.String]::IsNullOrEmpty($node.DefaultGateway)) {
-            DefaultGatewayAddress 'PrimaryDefaultGateway' {
-                InterfaceAlias = $node.InterfaceAlias
-                Address        = $node.DefaultGateway
-                AddressFamily  = $node.AddressFamily
+            if (($node.Nodename) -ne 'POSHFS') {
+                DefaultGatewayAddress 'PrimaryDefaultGateway' {
+                    InterfaceAlias = $node.InterfaceAlias
+                    Address        = $node.DefaultGateway
+                    AddressFamily  = $node.AddressFamily
+                }
             }
         }
         If (-not [System.String]::IsNullOrEmpty($node.DnsServerAddress)) {
@@ -74,7 +79,7 @@
             }
         } #End foreach
 
-    #endregion
+        #endregion
         
 
     }#end allnodes
@@ -89,12 +94,12 @@
             
         }
         ## Hack to fix DependsOn with hypens "bug" :(
-        foreach ($feature in $AllNodes.Where({$_.nodename -eq 'POSHDC1'}).Features)
-         {
+        foreach ($feature in $AllNodes.Where( { $_.nodename -eq 'POSHDC1' }).Features) {
             WindowsFeature $feature.Replace('-', '') {
                 Ensure               = 'Present';
                 Name                 = $feature;
                 IncludeAllSubFeature = $False;
+
             }
         } #End foreach
 
@@ -189,15 +194,15 @@
                     Members    = $Users.Where( { $_.afdeling -eq "$($ou.name)" }).account
                 }
             }#end if
-            elseif($ou.name -eq 'Directie'){
-            ADgroup $ou.name {
+            elseif ($ou.name -eq 'Directie') {
+                ADgroup $ou.name {
                     Path       = "OU=$($ou.Name),OU=$($dcdata.ou),$($dcdata.DomainDN)"
                     GroupName  = 'Staf'
                     Category   = 'Security'
                     GroupScope = 'Global'
                     DependsOn  = '[ADDomain]FirstDC'
                     Members    = $Users.Where( { $_.afdeling -eq "$($ou.name)" }).account
-                   }  
+                }  
             }
             else {
                 ADgroup $ou.name {
@@ -207,28 +212,25 @@
                     GroupScope = 'Global'
                     DependsOn  = '[ADDomain]FirstDC'
                     Members    = $Users.Where( { $_.afdeling -eq "$($ou.name)" }).account
-                   }                   
+                }                   
             }#en if else
             
         }# end region groups
-        ADGroup DomainAdmin
-                   {
-                     GroupName = 'Domain Admins'
-                     MembersToInclude = 'Automatisering'
-                     DependsOn = if(($ou.name) -eq 'Automatisering'){"[ADGroup]$($ou.name)"}
-                   }
-                   ADGroup EnterpriseAdmin
-                   {
-                     GroupName = 'Enterprise Admins'
-                     MembersToInclude = 'Automatisering'
-                     DependsOn = if(($ou.name) -eq 'Automatisering'){"[ADGroup]$($ou.name)"}
-                   }
-                   ADGroup Admin
-                   {
-                     GroupName = 'Administrators'
-                     MembersToInclude = 'Automatisering'
-                     DependsOn = if(($ou.name) -eq 'Automatisering'){"[ADGroup]$($ou.name)"}
-                   }
+        ADGroup DomainAdmin {
+            GroupName        = 'Domain Admins'
+            MembersToInclude = 'Automatisering'
+            DependsOn        = if (($ou.name) -eq 'Automatisering') { "[ADGroup]$($ou.name)" }
+        }
+        ADGroup EnterpriseAdmin {
+            GroupName        = 'Enterprise Admins'
+            MembersToInclude = 'Automatisering'
+            DependsOn        = if (($ou.name) -eq 'Automatisering') { "[ADGroup]$($ou.name)" }
+        }
+        ADGroup Admin {
+            GroupName        = 'Administrators'
+            MembersToInclude = 'Automatisering'
+            DependsOn        = if (($ou.name) -eq 'Automatisering') { "[ADGroup]$($ou.name)" }
+        }
         
     }#End Region firstdc
     
@@ -237,8 +239,7 @@
     node $AllNodes.Where{ $_.Role -eq 'SecondDC' }.NodeName
     {
         ## Hack to fix DependsOn with hypens "bug" :(
-        foreach ($feature in $AllNodes.Where({$_.nodename -eq 'POSHDC2'}).Features)
-         {
+        foreach ($feature in $AllNodes.Where( { $_.nodename -eq 'POSHDC2' }).Features) {
             WindowsFeature $feature.Replace('-', '') {
                 Ensure               = 'Present';
                 Name                 = $feature;
@@ -246,10 +247,10 @@
             }
         } #End foreach
         WaitForADDomain DscForestWait {
-            DomainName           = $DCData.DomainName
-            Credential = $DomainCredential
+            DomainName   = $DCData.DomainName
+            Credential   = $DomainCredential
             RestartCount = '20'
-            WaitTimeout = '600'
+            WaitTimeout  = '600'
         }
         Computer JoinDC {
             Name       = $Node.NodeName
@@ -269,31 +270,66 @@
     }# End region secondDC
 
     #Region FS
-    node $AllNodes.Where{ $_.Role -eq 'POSHFS' }.NodeName
+    node $AllNodes.Where{ $_.Role -eq 'ROUTING' }.NodeName
     {
-        
+        foreach ($feature in $AllNodes.Where( { $_.nodename -eq 'POSHFS' }).Features) {
+            WindowsFeature $feature.Replace('-', '') {
+                Ensure               = 'Present';
+                Name                 = $feature;
+                IncludeAllSubFeature = $False;
+            }
+            write-host $feature
+        }# End foreach
     }# End region FS
 
     #Region Client
     node $AllNodes.Where{ $_.Role -eq 'CLIENT' }.NodeName
     {
-        PowerShellExecutionPolicy client
-        {
+        PowerShellExecutionPolicy client {
             ExecutionPolicyScope = 'Localmachine'
-            ExecutionPolicy = 'Remotesigned'
+            ExecutionPolicy      = 'Remotesigned'
         }
+       # Adds RSAT which is now a Windows Capability in Windows 10    
+            Script RSAT {
+                TestScript = {
+                    $packages = Get-WindowsCapability -online -Name Rsat*
+                    if ($packages.state -match "Installed") {
+                        Return $True
+                    }
+                    else {
+                        Return $False
+                    }
+                }
+    
+                GetScript  = {
+                    $packages = Get-WindowsCapability -online -Name Rsat* | Select-Object Displayname, State
+                    $installed = $packages.Where( { $_.state -eq "Installed" })
+                    Return @{Result = "$($installed.count)/$($packages.count) RSAT features installed" }
+                }
+    
+                SetScript  = {
+                    Get-WindowsCapability -online -Name Rsat* | Where-Object { $_.state -ne "installed" } | Add-WindowsCapability -online
+                }
+            }
+    
+            #since RSAT is added to the client go ahead and create a Scripts folder
+            File scripts {
+                DestinationPath = 'C:\Scripts'
+                Ensure          = 'present'
+                type            = 'directory'
+            }
     }# End region Client
 
     #region DomainJoin config
-    node $AllNodes.Where( {$_.Role -eq 'domainJoin'}).NodeName {
+    node $AllNodes.Where( { $_.Role -eq 'domainJoin' }).NodeName {
 
         
 
         WaitForADDomain DscForestWait {
-            DomainName  = $DCData.DomainName
-            Credential = $DomainCredential
+            DomainName   = $DCData.DomainName
+            Credential   = $DomainCredential
             RestartCount = '20'
-            WaitTimeout = '600'
+            WaitTimeout  = '600'
         }
 
         Computer JoinDC {
@@ -304,7 +340,7 @@
         }
     }#end DomainJoin Config
     
-    node $AllNodes.Where( {$_.Role -eq 'ExtraHdd'}).NodeName {
+    node $AllNodes.Where( { $_.Role -eq 'ExtraHdd' }).NodeName {
         WaitForDisk Disk1 {
             DiskId           = 1
             RetryIntervalSec = 60
@@ -326,207 +362,151 @@
             DependsOn   = '[Disk]XVolume'
         }
 
-        file 'eerste' 
-        {
-            Type = 'Directory'
+        file 'eerste' {
+            Type            = 'Directory'
             DestinationPath = 'X:\Data\Eerste'
-            Ensure = "Present"
-            DependsOn = '[Disk]XVolume'
+            Ensure          = "Present"
+            DependsOn       = '[Disk]XVolume'
         }
-        file 'tweede' 
-        {
-            Type = 'Directory'
+        file 'tweede' {
+            Type            = 'Directory'
             DestinationPath = 'X:\Data\Tweede'
-            Ensure = "Present"
-            DependsOn = '[Disk]XVolume'
+            Ensure          = "Present"
+            DependsOn       = '[Disk]XVolume'
         }
-        file 'home' 
-        {
-            Type = 'Directory'
+        file 'home' {
+            Type            = 'Directory'
             DestinationPath = 'z:\Users\Home'
-            Ensure = "Present"
-            DependsOn = '[Disk]ZVolume'
+            Ensure          = "Present"
+            DependsOn       = '[Disk]ZVolume'
         }
-         file 'profile'
-        {
-            Type = 'Directory'
+        file 'profile' {
+            Type            = 'Directory'
             DestinationPath = 'z:\Users\Profiles'
-            Ensure = "Present"
-            DependsOn = '[Disk]ZVolume'
+            Ensure          = "Present"
+            DependsOn       = '[Disk]ZVolume'
         }
 
-        file 'Directie'
-        {
-            Type = 'Directory'
+        file 'Directie' {
+            Type            = 'Directory'
             DestinationPath = 'x:\data\eerste\staf\Directie'
-            Ensure = "Present"
-            DependsOn = '[file]staf'
+            Ensure          = "Present"
+            DependsOn       = '[file]staf'
         }
-        file 'staf'
-        {
-            Type = 'Directory'
+        file 'staf' {
+            Type            = 'Directory'
             DestinationPath = 'x:\data\eerste\Staf'
-            Ensure = "Present"
-            DependsOn = '[Disk]XVolume'
+            Ensure          = "Present"
+            DependsOn       = '[Disk]XVolume'
         }
-        file 'administratie'
-        {
-            Type = 'Directory'
+        file 'administratie' {
+            Type            = 'Directory'
             DestinationPath = 'x:\data\eerste\Administratie'
-            Ensure = "Present"
-            DependsOn = '[Disk]XVolume'
+            Ensure          = "Present"
+            DependsOn       = '[Disk]XVolume'
         }
-        FileSystemAccessRule 'AddRightChange'
-        {
-            Path = 'x:\data\eerste\Administratie'
+        FileSystemAccessRule 'AddRightChange' {
+            Path     = 'x:\data\eerste\Administratie'
             Identity = "$($dcdata.NetbiosName)\Staf"
-            Rights = @('ChangePermissions')
+            Rights   = @('ChangePermissions')
         }
 
-        file 'Automatisering'
-        {
-            Type = 'Directory'
+        file 'Automatisering' {
+            Type            = 'Directory'
             DestinationPath = 'x:\data\eerste\Automatisering'
-            Ensure = "Present"
-            DependsOn = '[Disk]XVolume'
+            Ensure          = "Present"
+            DependsOn       = '[Disk]XVolume'
         }
-        file 'Software'
-        {
-            Type = 'Directory'
+        file 'Software' {
+            Type            = 'Directory'
             DestinationPath = 'x:\data\eerste\Software'
-            Ensure = "Present"
-            DependsOn = '[Disk]XVolume'
+            Ensure          = "Present"
+            DependsOn       = '[Disk]XVolume'
         }
-        file 'Verkoop' 
-        {
-            Type = 'Directory'
+        file 'Verkoop' {
+            Type            = 'Directory'
             DestinationPath = 'X:\Data\Tweede\Verkoop'
-            Ensure = "Present"
-            DependsOn = '[Disk]XVolume'
+            Ensure          = "Present"
+            DependsOn       = '[Disk]XVolume'
         }
-        file 'productie' 
-        {
-            Type = 'Directory'
+        file 'productie' {
+            Type            = 'Directory'
             DestinationPath = 'X:\Data\Tweede\Productie'
-            Ensure = "Present"
-            DependsOn = '[Disk]XVolume'
+            Ensure          = "Present"
+            DependsOn       = '[Disk]XVolume'
         }
-        file 'fabricage' 
-        {
-            Type = 'Directory'
+        file 'fabricage' {
+            Type            = 'Directory'
             DestinationPath = 'X:\Data\Tweede\Productie\Fabricage'
-            Ensure = "Present"
-            DependsOn = '[file]productie'
+            Ensure          = "Present"
+            DependsOn       = '[file]productie'
         }
 
-        file 'algemeen' 
-        {
-            Type = 'Directory'
+        file 'algemeen' {
+            Type            = 'Directory'
             DestinationPath = 'X:\Data\Tweede\Algemeen'
-            Ensure = "Present"
-            DependsOn = '[Disk]XVolume'
+            Ensure          = "Present"
+            DependsOn       = '[Disk]XVolume'
         }
 
 
-        SmbShare 'Data1'
-        {
-            Name = 'Data1'
-            Path = 'x:\data\eerste'
-            Description = 'Eerste datashare'
+        SmbShare 'Data1' {
+            Name         = 'Data1'
+            Path         = 'x:\data\eerste'
+            Description  = 'Eerste datashare'
             ChangeAccess = @('Users')
-            DependsOn = '[File]eerste'
+            DependsOn    = '[File]eerste'
         }
-        SmbShare 'Data2'
-        {
-            Name = 'Data2'
-            Path = 'x:\data\tweede'
-            Description = 'Tweede datashare'
+        SmbShare 'Data2' {
+            Name                = 'Data2'
+            Path                = 'x:\data\tweede'
+            Description         = 'Tweede datashare'
             ConcurrentUserLimit = 20
-            DependsOn = '[File]tweede'
-         }
-         SmbShare 'HomeFolders'
-         {
-            Name = 'UserFolders'
-            Path = 'z:\users\home'
-            Description = 'HomeFolders'
+            DependsOn           = '[File]tweede'
+        }
+        SmbShare 'HomeFolders' {
+            Name                = 'UserFolders'
+            Path                = 'z:\users\home'
+            Description         = 'HomeFolders'
             ConcurrentUserLimit = 30
-            DependsOn = '[File]home'
-         }
-         SmbShare 'ProfileFolder'
-         {
-            Name = 'UserProfiles'
-            Path = 'z:\users\profiles'
-            Description = 'ProfileFolder'
+            DependsOn           = '[File]home'
+        }
+        SmbShare 'ProfileFolder' {
+            Name                = 'UserProfiles'
+            Path                = 'z:\users\profiles'
+            Description         = 'ProfileFolder'
             ConcurrentUserLimit = 40
-            DependsOn = '[File]home'
-         }
-
-         VSS disk_X
-         {
-            Drive = 'X:'
-            Size = 1Gb
-            Ensure = 'Present'
-            Dependson = '[Disk]Xvolume'
-         }
-
-         VSS disk_Z
-         {
-            Drive = 'Z:'
-            Size = 1Gb
-            Ensure = 'Present'
-            Dependson = '[Disk]Xvolume'
-         }
-
-         VSSTaskScheduler Disk_X_7 {
-
-       Ensure = 'present'
-       Drive = 'X:'
-       TimeTrigger = '7:00 AM'
-       TaskName = 'Disk_X'
-       Credential = $domaincredential
-       DependsOn = '[VSS]Disk_X'
-      }
-
-     }
-
-    #region RSAT config
-    node $AllNodes.Where( {$_.Role -eq 'CLIENT'}).NodeName {
-
-        # Adds RSAT which is now a Windows Capability in Windows 10
-
-        Script RSAT {
-            TestScript = {
-                $packages = Get-WindowsCapability -online -Name Rsat*
-                if ($packages.state -match "Installed") {
-                    Return $True
-                }
-                else {
-                    Return $False
-                }
-            }
-
-            GetScript  =  {
-                $packages = Get-WindowsCapability -online -Name Rsat* | Select-Object Displayname, State
-                $installed = $packages.Where({$_.state -eq "Installed"})
-                Return @{Result = "$($installed.count)/$($packages.count) RSAT features installed"}
-            }
-
-            SetScript  = {
-                Get-WindowsCapability -online -Name Rsat* | Where-Object {$_.state -ne "installed"} | Add-WindowsCapability -online
-            }
+            DependsOn           = '[File]home'
         }
 
-        #since RSAT is added to the client go ahead and create a Scripts folder
-        File scripts {
-            DestinationPath = 'C:\Scripts'
-            Ensure          = 'present'
-            type            = 'directory'
+        VSS disk_X {
+            Drive     = 'X:'
+            Size      = 1Gb
+            Ensure    = 'Present'
+            Dependson = '[Disk]Xvolume'
         }
 
-    }#end RSAT Config
+        VSS disk_Z {
+            Drive     = 'Z:'
+            Size      = 1Gb
+            Ensure    = 'Present'
+            Dependson = '[Disk]Xvolume'
+        }
 
-    #region DHCP
-    node $AllNodes.Where( {$_.Role -eq 'DHCP'}).NodeName {       
+        VSSTaskScheduler Disk_X_7 {
+
+            Ensure      = 'present'
+            Drive       = 'X:'
+            TimeTrigger = '7:00 AM'
+            TaskName    = 'Disk_X'
+            Credential  = $domaincredential
+            DependsOn   = '[VSS]Disk_X'
+        }
+
+    }
+
+   #region DHCP
+    node $AllNodes.Where( { $_.Role -eq 'DHCP' }).NodeName {       
             
 
         xDhcpServerAuthorization 'DhcpServerAuthorization' {
@@ -553,11 +533,10 @@
             AddressFamily      = $DHCPData.DHCPAddressFamily
             DependsOn          = '[xDhcpServerScope]DhcpScope'
         }
-        xDhcpServerReservation Client
-        {
-            ScopeID = "$($DHCPData.DHCPScopeID)"
+        xDhcpServerReservation Client {
+            ScopeID          = "$($DHCPData.DHCPScopeID)"
             ClientMACAddress = "$($allnodes.where({$_.nodename -eq "POSHCL1"}).macaddress)".insert(2, "-").insert(5, "-").insert(8, "-").insert(11, "-").insert(14, "-")
-            IPAddress = "$($DHCPData.DHCPReservationIp)"
+            IPAddress        = "$($DHCPData.DHCPReservationIp)"
         }
 
     } #end DHCP Config
