@@ -11,8 +11,8 @@ foreach ($module in $modules) {
 $vms = get-vm posh*
 
 ForEach ($vm in $vms) {
-        
-        
+    if(($vm.state) -eq 'Off')    
+        {
     $VhdxPath = ($vm.HardDrives | Where-Object { $_.ControllerLocation -eq 0 }).path
             
     $Driveletter = "$((Mount-VHD $vhdxpath -Passthru | Get-Disk | Get-Partition | where-object{$_.Type -eq "Basic" }).DriveLetter):"
@@ -32,6 +32,7 @@ ForEach ($vm in $vms) {
         copy-item  "C:\Program Files\WindowsPowerShell\Modules\$module" -Destination "$Driveletter\Program Files\WindowsPowerShell\Modules\$module" -Recurse
     }
     Dismount-VHD -Path $VhdxPath
+}# end if
     #start-vm $vm.name
     #vmconnect localhost $vm.name    
 }#End foreach
