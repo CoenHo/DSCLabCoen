@@ -33,6 +33,6 @@ ForEach ($vm in $vms) {
     }
     Dismount-VHD -Path $VhdxPath
 }# end if
-    #start-vm $vm.name
-    #vmconnect localhost $vm.name    
+    start-vm $vm.name
+    #vmconnect localhost poshcl1   
 }#End foreach
