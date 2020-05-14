@@ -64,23 +64,14 @@ configuration xVMHyperV_Complete
             }
         }
 
-        # Create new VHD
-        #xVhd NewVhd
-        #{
-        #    Ensure           = 'Present'
-        #    Name             = "$VMName-OSDisk.vhdx"
-        #    Path             = $Path
-        #    Generation       = 'vhdx'
-        #    MaximumSizeBytes = $VhdSizeBytes
-        #    DependsOn        = $HyperVDependency
-        #}
         $ConfigData.AllNodes.Where{ $_.Role -eq "VM" }.VmName | ForEach-Object {
-            
+            #Make sure that path for vhdx exists
             file $_ {
                 DestinationPath = (join-path -Path $VmPath -ChildPath "$_\Virtual Hard Disks")
                 Type            = 'Directory'
                 Ensure          = 'Present'
             }
+            #There is an other base vhdx for windows 10
             if ($_ -eq 'POSHCL1') {
                 $diffvhddependecy = "[xVhd]$_"
                 xVhd $_ {
@@ -93,6 +84,7 @@ configuration xVMHyperV_Complete
                     DependsOn  = "[File]$_", $HyperVDependency
                 }
             }
+            #Windows server core
             else {
                 $diffvhddependecy = "[xVhd]$_"
                 xVhd $_ {
@@ -105,6 +97,7 @@ configuration xVMHyperV_Complete
                     DependsOn  = "[File]$_", $HyperVDependency
                 }
             }
+            #if name like POSHDC an extra hardrive will be added
             if ($_ -like 'POSHDC*') {
                 xvhd "$_-Data" {
                     Ensure           = 'Present'
@@ -132,37 +125,20 @@ configuration xVMHyperV_Complete
             }# End if not node3
             # Ensures a VM with all the properties
             $node = $_
-            if ($_ -eq "POSHFS") {
-                xVMHyperV $_ {
-                    Ensure                      = 'Present'
-                    Name                        = "$_"
-                    VhdPath                     = (join-path -Path $VmPath -ChildPath "$_\Virtual Hard Disks\$_-OSDisk.vhdx")
-                    SwitchName                  = $ConfigData.NonNodeData.SwitchName
-                    State                       = $State
-                    Path                        = $vmPath
-                    Generation                  = 2
-                    StartupMemory               = $ConfigData.NonNodeData.StartUpMemory
-                    MinimumMemory               = $ConfigData.NonNodeData.MinimumMemory
-                    MaximumMemory               = $ConfigData.NonNodeData.MaximumMemory
-                    ProcessorCount              = $ConfigData.NonNodeData.ProcessorCount
-                    MACAddress                  = $ConfigData.Nodes.where{ $_.Name -eq $node }.macaddressex
-                    RestartIfNeeded             = $true
-                    WaitForIP                   = $WaitForIP
-                    AutomaticCheckpointsEnabled = $ConfigData.NonNodeData.AutomaticSnapshotEnabled
-                    DependsOn                   = $diffvhddependecy
-                }
+            if ($_ -eq "POSHFS") {                
                 
                 xVMNetworkAdapter MyVM01NIC {
-                    Id         = 'LAN'
-                    Name       = 'LAN'
-                    SwitchName = 'LAB'
-                    MacAddress = $ConfigData.Nodes.where{ $_.Name -eq $node }.macaddress
+                    Id         = 'WAN'
+                    Name       = 'WAN'
+                    SwitchName = 'Default Switch'
+                    MacAddress = $ConfigData.Nodes.where{ $_.Name -eq $node }.macaddressex
                     VMName     = $_
                     Ensure     = 'Present'
+                    Dependson = '[xVMHyperV]POSHFS'
                 }
             }# end if node1
-            else {
-                xVMHyperV $_ {
+
+                            xVMHyperV $_ {
                     Ensure                      = 'Present'
                     Name                        = "$_"
                     VhdPath                     = (join-path -Path $VmPath -ChildPath "$_\Virtual Hard Disks\$_-OSDisk.vhdx")
@@ -179,10 +155,7 @@ configuration xVMHyperV_Complete
                     WaitForIP                   = $WaitForIP
                     AutomaticCheckpointsEnabled = $ConfigData.NonNodeData.AutomaticSnapshotEnabled
                     DependsOn                   = $diffvhddependecy
-                }
-            }# end els node1
-            
-            
+                }           
         }
         
     }
