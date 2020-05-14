@@ -15,7 +15,7 @@
                 </RunSynchronousCommand>
                 <RunSynchronousCommand wcm:action="add">
                     <Order>3</Order>
-                    <Path>cmd /c reg add HKLM\SOFTWARE\Microsoft\PowerShell\1\ShellIds\Microsoft.PowerShell /v ExecutionPolicy /t REG_SZ /d Unrestricted /f</Path>
+                    <Path>cmd /c reg add HKLM\SOFTWARE\Microsoft\PowerShell\1\ShellIds\Microsoft.PowerShell /v ExecutionPolicy /t REG_SZ /d unrestricted /f</Path>
                     <Description>Enable Powershell Remoting 3</Description>
                 </RunSynchronousCommand>
             </RunSynchronous>
@@ -47,6 +47,23 @@
             <UserLocale>nl-NL</UserLocale>
         </component>
         <component name="Microsoft-Windows-Shell-Setup" processorArchitecture="wow64" publicKeyToken="31bf3856ad364e35" language="neutral" versionScope="nonSxS" xmlns:wcm="http://schemas.microsoft.com/WMIConfig/2002/State" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+           <FirstLogonCommands>
+        <SynchronousCommand wcm:action="add">
+            <CommandLine>winrm quickconfig -quiet</CommandLine>
+            <Description>Enable Windows Remoting</Description>
+            <Order>1</Order>
+        </SynchronousCommand>
+        <SynchronousCommand wcm:action="add">
+            <CommandLine>winrm quickconfig -quiet -force</CommandLine>
+            <Description>Enable Windows Remoting</Description>
+            <Order>2</Order>
+        </SynchronousCommand>
+       <RunSynchronousCommand wcm:action="add">
+            <Description>Enable PowerShell Remoting 3</Description>
+            <Order>3</Order>
+            <Path>cmd /c reg add HKLM\SOFTWARE\Microsoft\PowerShell\1\ShellIds\Microsoft.PowerShell /v ExecutionPolicy /t REG_SZ /d Unrestricted /f</Path>
+        </RunSynchronousCommand>
+        </FirstLogonCommands>
             <UserAccounts>
                 <LocalAccounts>
                     <LocalAccount wcm:action="add">
