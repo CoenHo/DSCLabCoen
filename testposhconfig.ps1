@@ -278,8 +278,15 @@
                 Name                 = $feature;
                 IncludeAllSubFeature = $False;
             }
-            write-host $feature
         }# End foreach
+
+        Script 'Routing'
+        {
+            SetScript = {powershell.exe c:\ConfigFiles\Routing.ps1}
+            TestScript = {$false}
+            GetScript = { <# Do Nothing #> }
+            DependsOn  = '[Windowsfeature]Routing'
+        }
     }# End region FS
 
     #Region Client

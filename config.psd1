@@ -21,28 +21,27 @@
             Role       = @('FirstDC', 'DHCP', 'ExtraHdd')
             IpAddress  = '192.168.5.1'
             MacAddress = '001523be0c01'
-            Features = @('AD-Domain-Services', 'DHCP','FS-Resource-Manager','FS-DFS-Replication','FS-DFS-NameSpace')
+            Features   = @('AD-Domain-Services', 'DHCP', 'FS-Resource-Manager', 'FS-DFS-Replication', 'FS-DFS-NameSpace')
         },
         @{
             NodeName   = 'POSHDC2'
             Role       = @('SecondDC', 'ExtraHdd')
             IpAddress  = '192.168.5.2'
             MacAddress = '001523be0c02'
-            Features = @('AD-Domain-Services','FS-Resource-Manager','FS-DFS-Replication','FS-DFS-NameSpace')
+            Features   = @('AD-Domain-Services', 'FS-Resource-Manager', 'FS-DFS-Replication', 'FS-DFS-NameSpace')
         },
         @{
             NodeName     = 'POSHFS'
-            Role         = @('FS', 'ROUTING','domainJoin')
+            Role         = @('FS', 'ROUTING', 'domainJoin')
             IpAddress    = '192.168.5.254'
             MacAddress   = '001523be0c03'
             MacAddressEx = '001523be0c04'
-            Features = @('ROUTING','RSAT-RemoteAccess')
+            Features     = @('ROUTING', 'RSAT-RemoteAccess')
         },
         @{
             NodeName   = 'POSHCL1'
-            Role       = @('CLIENT','domainJoin')
+            Role       = @('CLIENT', 'domainJoin')
             MacAddress = '001523be0c05'
-            IpAddress  = '192.168.5.10'
         }
     )
     Credential = @{
@@ -68,7 +67,7 @@
         DHCPAddressFamily      = 'IPv4'
         DHCPLeaseDuration      = '00:08:00'
         DHCPScopeID            = '192.168.5.0'
-        DHCPDnsServerIPAddress = @('192.168.5.1','192.168.5.2')
+        DHCPDnsServerIPAddress = @('192.168.5.1', '192.168.5.2')
         DHCPRouter             = '192.168.5.254'
         DHCPReservationIp      = '192.168.5.150'
     }
