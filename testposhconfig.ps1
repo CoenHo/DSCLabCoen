@@ -34,9 +34,8 @@
             NewName    = 'LAB'
             MacAddress = "$($node.MacAddress)".insert(2, "-").insert(5, "-").insert(8, "-").insert(11, "-").insert(14, "-")
         }
-        write-host $node.NodeName
+        
         if ($node.Nodename -eq 'POSHFS') {
-            write-host "$($node.MacAddressex)"
             NetAdapterName RenameWanAdapter {
                 NewName    = 'WAN'
                 MacAddress = "$($node.MacAddressex)".insert(2, "-").insert(5, "-").insert(8, "-").insert(11, "-").insert(14, "-")
