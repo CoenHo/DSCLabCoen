@@ -134,28 +134,28 @@ configuration xVMHyperV_Complete
                     MacAddress = $ConfigData.Nodes.where{ $_.Name -eq $node }.macaddressex
                     VMName     = $_
                     Ensure     = 'Present'
-                    Dependson = '[xVMHyperV]POSHFS'
+                    Dependson  = '[xVMHyperV]POSHFS'
                 }
             }# end if node1
 
-                            xVMHyperV $_ {
-                    Ensure                      = 'Present'
-                    Name                        = "$_"
-                    VhdPath                     = (join-path -Path $VmPath -ChildPath "$_\Virtual Hard Disks\$_-OSDisk.vhdx")
-                    SwitchName                  = $ConfigData.NonNodeData.SwitchNameNonPublic
-                    State                       = $State
-                    Path                        = $vmPath
-                    Generation                  = 2
-                    StartupMemory               = $ConfigData.NonNodeData.StartUpMemory
-                    MinimumMemory               = $ConfigData.NonNodeData.MinimumMemory
-                    MaximumMemory               = $ConfigData.NonNodeData.MaximumMemory
-                    ProcessorCount              = $ConfigData.NonNodeData.ProcessorCount
-                    MACAddress                  = $ConfigData.Nodes.where{ $_.Name -eq $node }.macaddress
-                    RestartIfNeeded             = $true
-                    WaitForIP                   = $WaitForIP
-                    AutomaticCheckpointsEnabled = $ConfigData.NonNodeData.AutomaticSnapshotEnabled
-                    DependsOn                   = $diffvhddependecy
-                }           
+            xVMHyperV $_ {
+                Ensure                      = 'Present'
+                Name                        = "$_"
+                VhdPath                     = (join-path -Path $VmPath -ChildPath "$_\Virtual Hard Disks\$_-OSDisk.vhdx")
+                SwitchName                  = $ConfigData.NonNodeData.SwitchNameNonPublic
+                State                       = $State
+                Path                        = $vmPath
+                Generation                  = 2
+                StartupMemory               = $ConfigData.NonNodeData.StartUpMemory
+                MinimumMemory               = $ConfigData.NonNodeData.MinimumMemory
+                MaximumMemory               = $ConfigData.NonNodeData.MaximumMemory
+                ProcessorCount              = $ConfigData.NonNodeData.ProcessorCount
+                MACAddress                  = $ConfigData.Nodes.where{ $_.Name -eq $node }.macaddress
+                RestartIfNeeded             = $true
+                WaitForIP                   = $WaitForIP
+                AutomaticCheckpointsEnabled = $ConfigData.NonNodeData.AutomaticSnapshotEnabled
+                DependsOn                   = $diffvhddependecy
+            }           
         }
         
     }
@@ -206,7 +206,7 @@ $ConfigData = @{
 
 
 switch ((get-item env:computername).value) {
-    'LAPTOPCOEN' { xVMHyperV_Complete -ServerBasePath "Z:\VM\Base\WS2019_SE_UEFI.vhdx" -ClientBasePath "Z:\VM\Base\w10_E_1909.vhdx"  -ConfigurationData $ConfigData -OutputPath C:\dsc\hyperv -VmPath "z:\vm" }
+    'LAPTOPCOEN' { xVMHyperV_Complete -ServerBasePath "Z:\VM\Base\WS2019_SE_UEFI.vhdx" -ClientBasePath "Z:\VM\Base\W10E_UEFI.vhdx"  -ConfigurationData $ConfigData -OutputPath C:\dsc\hyperv -VmPath "z:\vm" }
     'SURFACE' { xVMHyperV_Complete -ServerBasePath "C:\vm\Base\WS2019_SE_UEFI.vhdx" -ClientBasePath "C:\vm\Base\W10_E_UEFI.vhdx"  -ConfigurationData $ConfigData -OutputPath C:\dsc\hyperv -VmPath "c:\vm" }
     'PSDEMO' { xVMHyperV_Complete -ServerBasePath "D:\VM\Base\WS2019_SE_UEFI.vhdx" -ClientBasePath "D:\VM\Base\w10_E_1909.vhdx"  -ConfigurationData $ConfigData -OutputPath C:\dsc\hyperv -VmPath "D:\vm" }
     'COENPC' { xVMHyperV_Complete -serverbasePath "D:\vm\Base\WS19_SE._UEFI.vhdx" -clientbasepath "D:\vm\Base\W10_E_UEFI.vhdx" -ConfigurationData $ConfigData -OutputPath C:\dsc\hyperv -VmPath "d:\vm" }
