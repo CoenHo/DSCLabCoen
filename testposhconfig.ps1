@@ -428,6 +428,11 @@
             Ensure          = "Present"
             DependsOn       = '[Disk]XVolume'
         }
+        FileSystemAccessRule 'AddRightFullControlAutomatisering' {
+            Path     = 'x:\data\eerste\Automatisering'
+            Identity = "$($dcdata.NetbiosName)\Automatisering"
+            Rights   = @('FullControl')
+        }
         file 'Software' {
             Type            = 'Directory'
             DestinationPath = 'x:\data\eerste\Software'
@@ -476,7 +481,7 @@
         }
         FileSystemAccessRule 'AddRightFullControlAlgemeen3' {
             Path     = 'x:\data\eerste\Algemeen'
-            Identity = "$($dcdata.NetbiosName)\Staf"
+            Identity = "$($dcdata.NetbiosName)\Automatisering"
             Rights   = @('FullControl')
         }
 
