@@ -206,7 +206,7 @@ $ConfigData = @{
 
 
 switch ((get-item env:computername).value) {
-    'LAPTOPCOEN' { xVMHyperV_Complete -ServerBasePath "$((get-vmhost).VirtualMachinePath)\Base\WS2019_SE_UEFI.vhdx" -ClientBasePath "$((get-vmhost).VirtualMachinePath)\Base\W10E_UEFI.vhdx"  -ConfigurationData $ConfigData -OutputPath "$((get-item env:userprofile).value)\Documents\GitHub\DSCLabCoen\dsc\hyperv" -VmPath "$((get-vmhost).VirtualMachinePath)" }
+    'LAPTOPCOEN' { xVMHyperV_Complete -ServerBasePath "$((get-vmhost).VirtualMachinePath)\Base\WS2019_SE_UEFI.vhdx" -ClientBasePath "$((get-vmhost).VirtualMachinePath)\Base\W10_E_UEFI.vhdx"  -ConfigurationData $ConfigData -OutputPath "$((get-item env:userprofile).value)\Documents\GitHub\DSCLabCoen\dsc\hyperv" -VmPath "$((get-vmhost).VirtualMachinePath)" }
     'SURFACE' { xVMHyperV_Complete -ServerBasePath "$((get-vmhost).VirtualMachinePath)\Base\WS2019_SE_UEFI.vhdx" -ClientBasePath "$((get-vmhost).VirtualMachinePath)\Base\W10_E_UEFI.vhdx"  -ConfigurationData $ConfigData -OutputPath "$((get-item env:userprofile).value)\Documenten\GitHub\DSCLabCoen\dsc\hyperv" -VmPath "$((get-vmhost).VirtualMachinePath)" }
     'COENPC' { xVMHyperV_Complete -serverbasePath "$((get-vmhost).VirtualMachinePath)\Base\WS19_SE._UEFI.vhdx" -clientbasepath "$((get-vmhost).VirtualMachinePath)\Base\W10_E_UEFI.vhdx" -ConfigurationData $ConfigData -OutputPath "$((get-item env:userprofile).value)\Documents\GitHub\DSCLabCoen\dsc\hyperv" -VmPath "$((get-vmhost).VirtualMachinePath)" }
     Default { write-host "PCName is unknown" }
