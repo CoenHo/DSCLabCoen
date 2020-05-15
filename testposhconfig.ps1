@@ -550,4 +550,4 @@
 }#end configuration
 
 
-testdsc -configurationdata $psscriptroot\config.psd1 -outputpath $psscriptroot\test
+testdsc -configurationdata $psscriptroot\config.psd1 -outputpath "$((get-item env:userprofile).value)\Documents\GitHub\DSCLabCoen\dsc\vms"
