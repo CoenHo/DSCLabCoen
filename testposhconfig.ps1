@@ -411,10 +411,15 @@
             Ensure          = "Present"
             DependsOn       = '[Disk]XVolume'
         }
-        FileSystemAccessRule 'AddRightChange' {
+        FileSystemAccessRule 'AddRightChangeAdministratie' {
             Path     = 'x:\data\eerste\Administratie'
             Identity = "$($dcdata.NetbiosName)\Staf"
             Rights   = @('ChangePermissions')
+        }
+        FileSystemAccessRule 'AddRightReadAdministratie' {
+            Path     = 'x:\data\eerste\Administratie'
+            Identity = "$($dcdata.NetbiosName)\Administratie"
+            Rights   = @('Read')
         }
 
         file 'Automatisering' {
@@ -454,7 +459,26 @@
             Ensure          = "Present"
             DependsOn       = '[Disk]XVolume'
         }
-
+        FileSystemAccessRule 'AddRightChangeAlgemeen' {
+            Path     = 'x:\data\eerste\Algemeen'
+            Identity = "$($dcdata.NetbiosName)\Directie"
+            Rights   = @('ChangePermissions')
+        }
+        FileSystemAccessRule 'AddRightChangeAlgemeen1' {
+            Path     = 'x:\data\eerste\Algemeen'
+            Identity = "$($dcdata.NetbiosName)\Administratie"
+            Rights   = @('ChangePermissions')
+        }
+        FileSystemAccessRule 'AddRightReadAlgemeen2' {
+            Path     = 'x:\data\eerste\Algemeen'
+            Identity = "$($dcdata.NetbiosName)\Domain Users"
+            Rights   = @('Read')
+        }
+        FileSystemAccessRule 'AddRightFullControlAlgemeen3' {
+            Path     = 'x:\data\eerste\Algemeen'
+            Identity = "$($dcdata.NetbiosName)\Staf"
+            Rights   = @('FullControl')
+        }
 
         SmbShare 'Data1' {
             Name         = 'Data1'
