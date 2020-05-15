@@ -1,6 +1,6 @@
 [
     {
-        "DistinguishedName":  "CN=IT,OU=IT,DC=Company,DC=Pri",
+        "DistinguishedName":  "CN=IT,OU=IT,DC=AC8-CoeHod,DC=int",
         "Name":  "IT",
         "GroupCategory":  "Security",
         "GroupScope":  "Global",
@@ -10,7 +10,7 @@
                     ]
     },
     {
-        "DistinguishedName":  "CN=Sales,OU=Sales,DC=Company,DC=Pri",
+        "DistinguishedName":  "CN=Sales,OU=Sales,DC=AC8-CoeHod,DC=int",
         "Name":  "Sales",
         "GroupCategory":  "Security",
         "GroupScope":  "Global",
@@ -21,7 +21,7 @@
                     ]
     },
     {
-        "DistinguishedName":  "CN=Marketing,OU=Marketing,DC=Company,DC=Pri",
+        "DistinguishedName":  "CN=Marketing,OU=Marketing,DC=AC8-CoeHod,DC=int",
         "Name":  "Marketing",
         "GroupCategory":  "Security",
         "GroupScope":  "Global",
@@ -32,7 +32,7 @@
                     ]
     },
     {
-        "DistinguishedName":  "CN=Accounting,OU=Accounting,DC=Company,DC=Pri",
+        "DistinguishedName":  "CN=Accounting,OU=Accounting,DC=AC8-CoeHod,DC=int",
         "Name":  "Accounting",
         "GroupCategory":  "Security",
         "GroupScope":  "Global",
@@ -43,7 +43,7 @@
                     ]
     },
     {
-        "DistinguishedName":  "CN=JEA Operators,OU=JEA_Operators,DC=Company,DC=Pri",
+        "DistinguishedName":  "CN=JEA Operators,OU=JEA_Operators,DC=AC8-CoeHod,DC=int",
         "Name":  "JEA Operators",
         "GroupCategory":  "Security",
         "GroupScope":  "Global",
