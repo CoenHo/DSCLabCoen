@@ -405,6 +405,32 @@
             Ensure          = "Present"
             DependsOn       = '[Disk]XVolume'
         }
+        FileSystemAccessRule 'AddRightChangeStaf' {
+            Path     = 'x:\data\eerste\Staf'
+            Identity = "$($dcdata.NetbiosName)\Directie"
+            Rights   = @('ChangePermissions')
+        }
+        FileSystemAccessRule 'AddRightChangeStaf1' {
+            Path     = 'x:\data\eerste\Staf'
+            Identity = "$($dcdata.NetbiosName)\Staf"
+            Rights   = @('ChangePermissions')
+        }
+        file 'administratie' {
+            Type            = 'Directory'
+            DestinationPath = 'x:\data\eerste\Administratie'
+            Ensure          = "Present"
+            DependsOn       = '[Disk]XVolume'
+        }
+        FileSystemAccessRule 'AddRightChangeStaf' {
+            Path     = 'x:\data\eerste\Staf'
+            Identity = "$($dcdata.NetbiosName)\Staf"
+            Rights   = @('ChangePermissions')
+        }
+        FileSystemAccessRule 'AddRightChangeStaf1' {
+            Path     = 'x:\data\eerste\Staf'
+            Identity = "$($dcdata.NetbiosName)\Directie"
+            Rights   = @('ChangePermissions')
+        }
         file 'administratie' {
             Type            = 'Directory'
             DestinationPath = 'x:\data\eerste\Administratie'
