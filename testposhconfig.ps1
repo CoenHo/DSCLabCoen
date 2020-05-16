@@ -197,17 +197,17 @@
         ADGroup DomainAdmin {
             GroupName        = 'Domain Admins'
             MembersToInclude = 'Automatisering'
-            DependsOn        = if (($ou.name) -eq 'Automatisering') { "[ADGroup]$($ou.name)" }
+            DependsOn        = '[ADGroup]Automatisering'
         }
         ADGroup EnterpriseAdmin {
             GroupName        = 'Enterprise Admins'
             MembersToInclude = 'Automatisering'
-            DependsOn        = if (($ou.name) -eq 'Automatisering') { "[ADGroup]$($ou.name)" }
+            DependsOn        = '[ADGroup]Automatisering'
         }
         ADGroup Admin {
             GroupName        = 'Administrators'
             MembersToInclude = 'Automatisering'
-            DependsOn        = if (($ou.name) -eq 'Automatisering') { "[ADGroup]$($ou.name)" }
+            DependsOn        = '[ADGroup]Automatisering'
         }
         
     }#End Region firstdc

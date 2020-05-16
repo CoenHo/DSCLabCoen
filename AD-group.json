@@ -1,6 +1,6 @@
 [
     {
-        "DistinguishedName":  "CN=Directie,OU=Directie,OU=CHAfdelingen,DC=AC8-CoeHod,DC=int",
+        "DistinguishedName":  "OU=Directie,OU=CHAfdelingen,DC=AC8-CoeHod,DC=int",
         "Name":  "Directie",
         "GroupCategory":  "Security",
         "GroupScope":  "Global",
@@ -14,7 +14,7 @@
                     ]
     },
     {
-        "DistinguishedName":  "CN=Verkoop,OU=Verkoop,OU=Marketing,OU=CHAfdelingen,DC=AC8-CoeHod,DC=int",
+        "DistinguishedName":  "OU=Verkoop,OU=Marketing,OU=CHAfdelingen,DC=AC8-CoeHod,DC=int",
         "Name":  "Verkoop",
         "GroupCategory":  "Security",
         "GroupScope":  "Global",
@@ -26,7 +26,7 @@
                     ]
     },
     {
-        "DistinguishedName":  "CN=Automatisering,OU=Automatisering,OU=CHAfdelingen,DC=AC8-CoeHod,DC=int",
+        "DistinguishedName":  "OU=Automatisering,OU=CHAfdelingen,DC=AC8-CoeHod,DC=int",
         "Name":  "Automatisering",
         "GroupCategory":  "Security",
         "GroupScope":  "Global",
@@ -38,7 +38,7 @@
                     ]
     },
     {
-        "DistinguishedName":  "CN=Productie,OU=Productie,OU=CHAfdelingen,DC=AC8-CoeHod,DC=int",
+        "DistinguishedName":  "OU=Productie,OU=CHAfdelingen,DC=AC8-CoeHod,DC=int",
         "Name":  "Productie",
         "GroupCategory":  "Security",
         "GroupScope":  "Global",
@@ -54,7 +54,7 @@
                     ]
     },
     {
-        "DistinguishedName":  "CN=Administratie,OU=Administratie,OU=CHAfdelingen,DC=AC8-CoeHod,DC=int",
+        "DistinguishedName":  "OU=Administratie,OU=CHAfdelingen,DC=AC8-CoeHod,DC=int",
         "Name":  "Administratie",
         "GroupCategory":  "Security",
         "GroupScope":  "Global",
@@ -65,7 +65,7 @@
                     ]
     },
     {
-        "DistinguishedName":  "CN=Fabricage,OU=Fabricage,OU=CHAfdelingen,DC=AC8-CoeHod,DC=int",
+        "DistinguishedName":  "OU=Fabricage,OU=CHAfdelingen,DC=AC8-CoeHod,DC=int",
         "Name":  "Fabricage",
         "GroupCategory":  "Security",
         "GroupScope":  "Global",
@@ -79,7 +79,7 @@
                     ]
     },
     {
-        "DistinguishedName":  "CN=Staf,OU=Staf,OU=CHAfdelingen,DC=AC8-CoeHod,DC=int",
+        "DistinguishedName":  "OU=Staf,OU=CHAfdelingen,DC=AC8-CoeHod,DC=int",
         "Name":  "Staf",
         "GroupCategory":  "Security",
         "GroupScope":  "Global",
