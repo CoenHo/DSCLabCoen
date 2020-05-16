@@ -439,11 +439,36 @@
             Ensure          = "Present"
             DependsOn       = '[Disk]XVolume'
         }
+        FileSystemAccessRule 'AddRightReadSoftware1' {
+            Path     = 'x:\data\eerste\Software'
+            Identity = "$($dcdata.NetbiosName)\Automatisering"
+            Rights   = @('FullControl')
+        }
+        FileSystemAccessRule 'AddRightChangeSoftware' {
+            Path     = 'x:\data\eerste\Software'
+            Identity = "$($dcdata.NetbiosName)\Domain Users"
+            Rights   = @('Read')
+        }
         file 'Verkoop' {
             Type            = 'Directory'
             DestinationPath = 'X:\Data\Tweede\Verkoop'
             Ensure          = "Present"
             DependsOn       = '[Disk]XVolume'
+        }
+        FileSystemAccessRule 'AddRightReadVerkoop2' {
+            Path     = 'x:\data\eerste\Verkoop'
+            Identity = "$($dcdata.NetbiosName)\Verkoop"
+            Rights   = @('ChangePermissions')
+        }
+        FileSystemAccessRule 'AddRightChangeVerkoop' {
+            Path     = 'x:\data\eerste\Verkoop'
+            Identity = "$($dcdata.NetbiosName)\Directie"
+            Rights   = @('Read')
+        }
+        FileSystemAccessRule 'AddRightChangeVerkoop1' {
+            Path     = 'x:\data\eerste\Verkoop'
+            Identity = "$($dcdata.NetbiosName)\Staf"
+            Rights   = @('Read')
         }
         file 'productie' {
             Type            = 'Directory'
@@ -461,7 +486,7 @@
             Identity = "$($dcdata.NetbiosName)\Staf"
             Rights   = @('Read')
         }
-        FileSystemAccessRule 'AddRightReadAProductie2' {
+        FileSystemAccessRule 'AddRightReadProductie2' {
             Path     = 'x:\data\eerste\Productie'
             Identity = "$($dcdata.NetbiosName)\Productie"
             Rights   = @('ChangePermissions')
