@@ -399,6 +399,22 @@
             Ensure          = "Present"
             DependsOn       = '[file]staf'
         }
+        FileSystemAccessRule 'AddRightChangeDirectie' {
+            Path     = 'x:\data\eerste\Directie'
+            Identity = "$($dcdata.NetbiosName)\Directie"
+            Rights   = @('ChangePermissions')
+        }
+        FileSystemAccessRule 'AddRightChangeDirectie1' {
+            Path     = 'x:\data\eerste\Directie'
+            Identity = "$($dcdata.NetbiosName)\Staf"
+            Rights   = @('ChangePermissions')
+        }
+        FileSystemAccessRule 'AddRightChangeDirectie2' {
+            Path     = 'x:\data\eerste\Directie'
+            Identity = "$($dcdata.NetbiosName)\Administratie"
+            Rights   = @('Read')
+        }
+        
         file 'staf' {
             Type            = 'Directory'
             DestinationPath = 'x:\data\eerste\Staf'
