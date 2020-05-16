@@ -457,6 +457,26 @@
             Ensure          = "Present"
             DependsOn       = '[file]productie'
         }
+        FileSystemAccessRule 'AddRightChangeAFabricage' {
+            Path     = 'x:\data\eerste\AFabricage'
+            Identity = "$($dcdata.NetbiosName)\Directie"
+            Rights   = @('Read')
+        }
+        FileSystemAccessRule 'AddRightChangeFabricage1' {
+            Path     = 'x:\data\eerste\Fabricage'
+            Identity = "$($dcdata.NetbiosName)\Staf"
+            Rights   = @('Read')
+        }
+        FileSystemAccessRule 'AddRightReadAFabricage2' {
+            Path     = 'x:\data\eerste\Fabricage'
+            Identity = "$($dcdata.NetbiosName)\Productie"
+            Rights   = @('ChangePermissions')
+        }
+        FileSystemAccessRule 'AddRightFullControlFabricage3' {
+            Path     = 'x:\data\eerste\Fabricage'
+            Identity = "$($dcdata.NetbiosName)\Fabricage"
+            Rights   = @('ChangePermissions')
+        }
 
         file 'algemeen' {
             Type            = 'Directory'
