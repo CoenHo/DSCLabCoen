@@ -48,6 +48,14 @@
     "Beschrijving": "Systeembeheerder"
   },
   {
+    "Account": "RSmit",
+    "Voornaam": "Rowan",
+    "Achternaam": "Smit",
+    "Afdeling": "Automatisering",
+    "Functie": "Programmeur",
+    "Beschrijving": "Programmeur"
+  },
+  {
     "Account": "JdeWit",
     "Voornaam": "Jan",
     "Achternaam": "Wit, de",

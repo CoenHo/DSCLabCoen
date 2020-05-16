@@ -1,55 +1,93 @@
 [
     {
-        "DistinguishedName":  "CN=IT,OU=IT,DC=AC8-CoeHod,DC=int",
-        "Name":  "IT",
+        "DistinguishedName":  "CN=Directie,OU=Directie,OU=CHAfdelingen,DC=AC8-CoeHod,DC=int",
+        "Name":  "Directie",
         "GroupCategory":  "Security",
         "GroupScope":  "Global",
+        "Manager":  "jdwit",
         "Members":  [
-                        "MikeS",
-                        "MaryL"
+                        "jdewit",
+                        "hslager",
+                        "ismulder",
+                        "swolf",
+                        "nsmeets"
                     ]
     },
     {
-        "DistinguishedName":  "CN=Sales,OU=Sales,DC=AC8-CoeHod,DC=int",
-        "Name":  "Sales",
+        "DistinguishedName":  "CN=Verkoop,OU=Verkoop,OU=Marketing,OU=CHAfdelingen,DC=AC8-CoeHod,DC=int",
+        "Name":  "Verkoop",
         "GroupCategory":  "Security",
         "GroupScope":  "Global",
+        "Manager": "hdeslager",
         "Members":  [
-                        "SamanthaS",
-                        "SonyaS",
-                        "SamS"
+                        "hdeslager",
+                        "pschalk",
+                        "hdevries"
                     ]
     },
     {
-        "DistinguishedName":  "CN=Marketing,OU=Marketing,DC=AC8-CoeHod,DC=int",
-        "Name":  "Marketing",
+        "DistinguishedName":  "CN=Automatisering,OU=Automatisering,OU=CHAfdelingen,DC=AC8-CoeHod,DC=int",
+        "Name":  "Automatisering",
         "GroupCategory":  "Security",
         "GroupScope":  "Global",
+        "Manager":  "ismulders",
         "Members":  [
-                        "MattS",
-                        "MonicaS",
-                        "MarkS"
+                        "ismulder",
+                        "rsmit",
+                        "chodzelmans"
                     ]
     },
     {
-        "DistinguishedName":  "CN=Accounting,OU=Accounting,DC=AC8-CoeHod,DC=int",
-        "Name":  "Accounting",
+        "DistinguishedName":  "CN=Productie,OU=Productie,OU=CHAfdelingen,DC=AC8-CoeHod,DC=int",
+        "Name":  "Productie",
         "GroupCategory":  "Security",
         "GroupScope":  "Global",
+        "Manager":  "swolf",
         "Members":  [
-                        "AaronS",
-                        "AndreaS",
-                        "AndyS"
+                        "swolf",
+                        "pboeren",
+                        "wbrand",
+                        "rzijlaart",
+                        "npeters",
+                        "fbeenhakker",
+                        "rvisser"
                     ]
     },
     {
-        "DistinguishedName":  "CN=JEA Operators,OU=JEA_Operators,DC=AC8-CoeHod,DC=int",
-        "Name":  "JEA Operators",
+        "DistinguishedName":  "CN=Administratie,OU=Administratie,OU=CHAfdelingen,DC=AC8-CoeHod,DC=int",
+        "Name":  "Administratie",
         "GroupCategory":  "Security",
         "GroupScope":  "Global",
+        "Manager": "nsmeets",
         "Members":  [
-                        "JimJ",
-                        "JillJ"
+                        "nsmeets",
+                        "wpellen"
+                    ]
+    },
+    {
+        "DistinguishedName":  "CN=Fabricage,OU=Fabricage,OU=CHAfdelingen,DC=AC8-CoeHod,DC=int",
+        "Name":  "Fabricage",
+        "GroupCategory":  "Security",
+        "GroupScope":  "Global",
+        "Manager": "wbrand",
+        "Members":  [
+                        "swolf",
+                        "wbrand",
+                        "npeters",
+                        "fbeenhakkr",
+                        "rvisser"
+                    ]
+    },
+    {
+        "DistinguishedName":  "CN=Staf,OU=Staf,OU=CHAfdelingen,DC=AC8-CoeHod,DC=int",
+        "Name":  "Staf",
+        "GroupCategory":  "Security",
+        "GroupScope":  "Global",
+        "Manager": "jdewit",
+        "Members":  [
+                        "jdewit",
+                        "ddevos",
+                        "pdijk"
                     ]
     }
 
