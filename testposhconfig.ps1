@@ -427,6 +427,11 @@
             Identity = "$($dcdata.NetbiosName)\Administratie"
             Rights   = @('Read')
         }
+        FileSystemAccessRule 'RemoveUsersAdministratie' {
+            Path     = 'x:\data\eerste\Administratie'
+            Identity = "$($dcdata.NetbiosName)\Users"
+            Ensure = 'Absent'
+        }
 
         file 'Automatisering' {
             Type            = 'Directory'
@@ -439,6 +444,11 @@
             Identity = "$($dcdata.NetbiosName)\Automatisering"
             Rights   = @('FullControl')
         }
+        FileSystemAccessRule 'RemoveUsersAutomatisering' {
+            Path     = 'x:\data\eerste\Automatisering'
+            Identity = "$($dcdata.NetbiosName)\Users"
+            Ensure = 'Absent'
+        }
         file 'Software' {
             Type            = 'Directory'
             DestinationPath = 'x:\data\eerste\Software'
@@ -450,11 +460,7 @@
             Identity = "$($dcdata.NetbiosName)\Automatisering"
             Rights   = @('FullControl')
         }
-        FileSystemAccessRule 'AddRightChangeSoftware' {
-            Path     = 'x:\data\eerste\Software'
-            Identity = "$($dcdata.NetbiosName)\Domain Users"
-            Rights   = @('Read')
-        }
+        
         file 'Verkoop' {
             Type            = 'Directory'
             DestinationPath = 'X:\Data\Tweede\Verkoop'
@@ -475,6 +481,11 @@
             Path     = 'x:\data\eerste\Verkoop'
             Identity = "$($dcdata.NetbiosName)\Staf"
             Rights   = @('Read')
+        }
+        FileSystemAccessRule 'RemoveUsersVerkoop' {
+            Path     = 'x:\data\eerste\Verkoop'
+            Identity = "$($dcdata.NetbiosName)\Users"
+            Ensure = 'Absent'
         }
         file 'productie' {
             Type            = 'Directory'
@@ -502,6 +513,11 @@
             Identity = "$($dcdata.NetbiosName)\Fabricage"
             Rights   = @('Read')
         }
+        FileSystemAccessRule 'RemoveUsersProductie' {
+            Path     = 'x:\data\eerste\Productie'
+            Identity = "$($dcdata.NetbiosName)\Users"
+            Ensure = 'Absent'
+        }
         file 'fabricage' {
             Type            = 'Directory'
             DestinationPath = 'X:\Data\Tweede\Productie\Fabricage'
@@ -528,7 +544,11 @@
             Identity = "$($dcdata.NetbiosName)\Fabricage"
             Rights   = @('ChangePermissions')
         }
-
+        FileSystemAccessRule 'RemoveUsersFabricage' {
+            Path     = 'x:\data\eerste\Fabricage'
+            Identity = "$($dcdata.NetbiosName)\Users"
+            Ensure = 'Absent'
+        }
         file 'algemeen' {
             Type            = 'Directory'
             DestinationPath = 'X:\Data\Tweede\Algemeen'
@@ -545,11 +565,7 @@
             Identity = "$($dcdata.NetbiosName)\Administratie"
             Rights   = @('ChangePermissions')
         }
-        FileSystemAccessRule 'AddRightReadAlgemeen2' {
-            Path     = 'x:\data\eerste\Algemeen'
-            Identity = "$($dcdata.NetbiosName)\Domain Users"
-            Rights   = @('Read')
-        }
+        
         FileSystemAccessRule 'AddRightFullControlAlgemeen3' {
             Path     = 'x:\data\eerste\Algemeen'
             Identity = "$($dcdata.NetbiosName)\Automatisering"
