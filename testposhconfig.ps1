@@ -1,6 +1,6 @@
 ﻿Configuration TestDSC
 {
-    Import-DscResource -ModuleName PSDesiredStateConfiguration, ComputerManagementDsc, ActiveDirectoryDSC, NetworkingDsc, xDHCPServer, StorageDSC, Mario_cVSS, FileSystemDsc
+    Import-DscResource -ModuleName PSDesiredStateConfiguration, ComputerManagementDsc, ActiveDirectoryDSC, NetworkingDsc, xDHCPServer, StorageDSC, Mario_cVSS, FileSystemDsc, cNtfsAccessControl
 
     $Secure = ConvertTo-SecureString -String "$($ConfigurationData.Credential.LabPassword)" -AsPlainText -Force
     $credential = New-Object -typename Pscredential -ArgumentList Administrator, $secure
