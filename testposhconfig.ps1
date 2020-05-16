@@ -118,6 +118,7 @@
         #Add OU, Groups, and Users
         $OUs = (Get-Content $PSScriptRoot\AD-OU.json | ConvertFrom-Json)
         $Users = (Get-Content $PSScriptRoot\AD-Users.json | ConvertFrom-Json)
+        $groups = (Get-Content $PSScriptRoot\AD-group.json | ConvertFrom-Json)
         
          
 
@@ -182,38 +183,16 @@
         } #user
 
         #region groups
-        Foreach ($ou in $Ous) {
-            if (($ou.name) -like "*koop") {
-                ADgroup $ou.name {
-                    Path       = "OU=$($ou.Name),OU=Marketing,OU=$($dcdata.ou),$($dcdata.DomainDN)"
-                    GroupName  = $ou.name
-                    Category   = 'Security'
-                    GroupScope = 'Global'
+        Foreach ($group in $groups) {
+           ADgroup $ou.name {
+                    Path       = $group.DistinguishedName
+                    GroupName  = $group.name
+                    Category   = $group.GroupCategory
+                    GroupScope = $group.GroupScope
                     DependsOn  = '[ADDomain]FirstDC'
-                    Members    = $Users.Where( { $_.afdeling -eq "$($ou.name)" }).account
+                    Members    = $group.Members
+                    ManagedBy = $group.Manager
                 }
-            }#end if
-            elseif ($ou.name -eq 'Directie') {
-                ADgroup $ou.name {
-                    Path       = "OU=$($ou.Name),OU=$($dcdata.ou),$($dcdata.DomainDN)"
-                    GroupName  = 'Staf'
-                    Category   = 'Security'
-                    GroupScope = 'Global'
-                    DependsOn  = '[ADDomain]FirstDC'
-                    Members    = $Users.Where( { $_.afdeling -eq "$($ou.name)" }).account
-                }  
-            }
-            else {
-                ADgroup $ou.name {
-                    Path       = "OU=$($ou.Name),OU=$($dcdata.ou),$($dcdata.DomainDN)"
-                    GroupName  = $ou.name
-                    Category   = 'Security'
-                    GroupScope = 'Global'
-                    DependsOn  = '[ADDomain]FirstDC'
-                    Members    = $Users.Where( { $_.afdeling -eq "$($ou.name)" }).account
-                }                   
-            }#en if else
-            
         }# end region groups
         ADGroup DomainAdmin {
             GroupName        = 'Domain Admins'
