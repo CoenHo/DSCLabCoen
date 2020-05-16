@@ -451,14 +451,34 @@
             Ensure          = "Present"
             DependsOn       = '[Disk]XVolume'
         }
+        FileSystemAccessRule 'AddRightChangeProductie' {
+            Path     = 'x:\data\eerste\Productie'
+            Identity = "$($dcdata.NetbiosName)\Directie"
+            Rights   = @('Read')
+        }
+        FileSystemAccessRule 'AddRightChangeProductie1' {
+            Path     = 'x:\data\eerste\Productie'
+            Identity = "$($dcdata.NetbiosName)\Staf"
+            Rights   = @('Read')
+        }
+        FileSystemAccessRule 'AddRightReadAProductie2' {
+            Path     = 'x:\data\eerste\Productie'
+            Identity = "$($dcdata.NetbiosName)\Productie"
+            Rights   = @('ChangePermissions')
+        }
+        FileSystemAccessRule 'AddRightFullControlProductie3' {
+            Path     = 'x:\data\eerste\Productie'
+            Identity = "$($dcdata.NetbiosName)\Fabricage"
+            Rights   = @('Read')
+        }
         file 'fabricage' {
             Type            = 'Directory'
             DestinationPath = 'X:\Data\Tweede\Productie\Fabricage'
             Ensure          = "Present"
             DependsOn       = '[file]productie'
         }
-        FileSystemAccessRule 'AddRightChangeAFabricage' {
-            Path     = 'x:\data\eerste\AFabricage'
+        FileSystemAccessRule 'AddRightChangeFabricage' {
+            Path     = 'x:\data\eerste\Fabricage'
             Identity = "$($dcdata.NetbiosName)\Directie"
             Rights   = @('Read')
         }
