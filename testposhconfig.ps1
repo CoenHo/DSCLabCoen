@@ -1,6 +1,6 @@
 ﻿Configuration TestDSC
 {
-    Import-DscResource -ModuleName PSDesiredStateConfiguration, ComputerManagementDsc, ActiveDirectoryDSC, NetworkingDsc, xDHCPServer, StorageDSC, Mario_cVSS, FileSystemDsc, cNtfsAccessControl
+    Import-DscResource -ModuleName PSDesiredStateConfiguration, ComputerManagementDsc, ActiveDirectoryDSC, NetworkingDsc, xDHCPServer, StorageDSC, Mario_cVSS, FileSystemDsc, cNtfsAccessControl, DFSDsc
 
     $Secure = ConvertTo-SecureString -String "$($ConfigurationData.Credential.LabPassword)" -AsPlainText -Force
     $credential = New-Object -typename Pscredential -ArgumentList Administrator, $secure
@@ -101,7 +101,12 @@
 
             }
         } #End foreach
-
+        WindowsFeature RSAT1
+        {
+            Ensure = 'Present'
+            Name = 'RSAT'
+            IncludeAllSubFeature = $true
+        }
         WaitForADDomain 'DscForestWait' {
             DomainName = $DCData.DomainName
         }#end wait
@@ -228,6 +233,12 @@
                 IncludeAllSubFeature = $False;
             }
         } #End foreach
+        WindowsFeature RSAT2
+        {
+            Ensure = 'Present'
+            Name = 'RSAT'
+            IncludeAllSubFeature = $true
+        }
         WaitForADDomain DscForestWait {
             DomainName   = $DCData.DomainName
             Credential   = $DomainCredential
@@ -261,7 +272,12 @@
                 IncludeAllSubFeature = $False;
             }
         }# End foreach
-
+        WindowsFeature RSAT3
+        {
+            Ensure = 'Present'
+            Name = 'RSAT'
+            IncludeAllSubFeature = $true
+        }
         Script 'Routing' {
             SetScript  = { powershell.exe c:\ConfigFiles\Routing.ps1 }
             TestScript = { $false }
@@ -1082,6 +1098,30 @@
 
     } #end DHCP Config
     #endregion
+    #region DFS
+    node $AllNodes.Where( { $_.Role -eq 'DFS' }).NodeName {
+        # Configure the namespace
+        DFSNamespaceRoot DFSNamespaceRoot_Domain_Software_POSHDC1
+        {
+            Path                 = "\\$($DCData.DomainName)\Data"
+            TargetPath           = '\\poshdc1\Data1'
+            Ensure               = 'Present'
+            Type                 = 'DomainV2'
+            Description          = 'AD Domain based DFS namespace for storing software installers'
+            PsDscRunAsCredential = $DomainCredential
+        } # End of DFSNamespaceRoot Resource
+
+        DFSNamespaceRoot DFSNamespaceRoot_Domain_Software_POSHDC2
+        {
+            Path                 = "\\$($DCData.DomainName)\Data"
+            TargetPath           = '\\poshdc2\Data1'
+            Ensure               = 'Present'
+            Type                 = 'DomainV2'
+            Description          = 'AD Domain based DFS namespace for storing software installers'
+            PsDscRunAsCredential = $DomainCredential
+        } # End of DFSNamespaceRoot Resource
+    }
+    #endregion DFS
 }#end configuration
 
 
