@@ -1,94 +1,93 @@
 [
     {
-        "DistinguishedName":  "OU=Directie,OU=CHAfdelingen,DC=AC8-CoeHod,DC=int",
-        "Name":  "Directie",
-        "GroupCategory":  "Security",
-        "GroupScope":  "Global",
-        "Manager":  "jdwit",
-        "Members":  [
-                        "jdewit",
-                        "hslager",
-                        "ismulder",
-                        "swolf",
-                        "nsmeets"
-                    ]
-    },
-    {
-        "DistinguishedName":  "OU=Verkoop,OU=Marketing,OU=CHAfdelingen,DC=AC8-CoeHod,DC=int",
-        "Name":  "Verkoop",
-        "GroupCategory":  "Security",
-        "GroupScope":  "Global",
-        "Manager": "hdeslager",
-        "Members":  [
-                        "hdeslager",
-                        "pschalk",
-                        "hdevries"
-                    ]
-    },
-    {
-        "DistinguishedName":  "OU=Automatisering,OU=CHAfdelingen,DC=AC8-CoeHod,DC=int",
-        "Name":  "Automatisering",
-        "GroupCategory":  "Security",
-        "GroupScope":  "Global",
-        "Manager":  "ismulders",
-        "Members":  [
-                        "ismulder",
-                        "rsmit",
-                        "chodzelmans"
-                    ]
-    },
-    {
-        "DistinguishedName":  "OU=Productie,OU=CHAfdelingen,DC=AC8-CoeHod,DC=int",
-        "Name":  "Productie",
-        "GroupCategory":  "Security",
-        "GroupScope":  "Global",
-        "Manager":  "swolf",
-        "Members":  [
-                        "swolf",
-                        "pboeren",
-                        "wbrand",
-                        "rzijlaart",
-                        "npeters",
-                        "fbeenhakker",
-                        "rvisser"
-                    ]
-    },
-    {
-        "DistinguishedName":  "OU=Administratie,OU=CHAfdelingen,DC=AC8-CoeHod,DC=int",
-        "Name":  "Administratie",
-        "GroupCategory":  "Security",
-        "GroupScope":  "Global",
-        "Manager": "nsmeets",
-        "Members":  [
-                        "nsmeets",
-                        "wpellen"
-                    ]
-    },
-    {
-        "DistinguishedName":  "OU=Fabricage,OU=CHAfdelingen,DC=AC8-CoeHod,DC=int",
-        "Name":  "Fabricage",
-        "GroupCategory":  "Security",
-        "GroupScope":  "Global",
-        "Manager": "wbrand",
-        "Members":  [
-                        "swolf",
-                        "wbrand",
-                        "npeters",
-                        "fbeenhakkr",
-                        "rvisser"
-                    ]
-    },
-    {
-        "DistinguishedName":  "OU=Staf,OU=CHAfdelingen,DC=AC8-CoeHod,DC=int",
-        "Name":  "Staf",
-        "GroupCategory":  "Security",
-        "GroupScope":  "Global",
+        "DistinguishedName": "OU=Directie,OU=CHAfdelingen,DC=AC8-CoeHod,DC=int",
+        "Name": "Directie",
+        "GroupCategory": "Security",
+        "GroupScope": "Global",
         "Manager": "jdewit",
-        "Members":  [
-                        "jdewit",
-                        "ddevos",
-                        "pdijk"
-                    ]
+        "Members": [
+            "jdewit",
+            "hslager",
+            "ismulder",
+            "swolf",
+            "nsmeets"
+        ]
+    },
+    {
+        "DistinguishedName": "OU=Verkoop,OU=Marketing,OU=CHAfdelingen,DC=AC8-CoeHod,DC=int",
+        "Name": "Verkoop",
+        "GroupCategory": "Security",
+        "GroupScope": "Global",
+        "Manager": "hslager",
+        "Members": [
+            "hslager",
+            "pschalk",
+            "hdevries"
+        ]
+    },
+    {
+        "DistinguishedName": "OU=Automatisering,OU=CHAfdelingen,DC=AC8-CoeHod,DC=int",
+        "Name": "Automatisering",
+        "GroupCategory": "Security",
+        "GroupScope": "Global",
+        "Manager": "ismulder",
+        "Members": [
+            "ismulder",
+            "rsmit",
+            "chodzelmans"
+        ]
+    },
+    {
+        "DistinguishedName": "OU=Productie,OU=CHAfdelingen,DC=AC8-CoeHod,DC=int",
+        "Name": "Productie",
+        "GroupCategory": "Security",
+        "GroupScope": "Global",
+        "Manager": "swolf",
+        "Members": [
+            "swolf",
+            "pboeren",
+            "wbrand",
+            "rzijlaart",
+            "npeters",
+            "fbeenhakker",
+            "rvisser"
+        ]
+    },
+    {
+        "DistinguishedName": "OU=Administratie,OU=CHAfdelingen,DC=AC8-CoeHod,DC=int",
+        "Name": "Administratie",
+        "GroupCategory": "Security",
+        "GroupScope": "Global",
+        "Manager": "nsmeets",
+        "Members": [
+            "nsmeets",
+            "wpellen"
+        ]
+    },
+    {
+        "DistinguishedName": "OU=Productie,OU=CHAfdelingen,DC=AC8-CoeHod,DC=int",
+        "Name": "Fabricage",
+        "GroupCategory": "Security",
+        "GroupScope": "Global",
+        "Manager": "wbrand",
+        "Members": [
+            "swolf",
+            "wbrand",
+            "npeters",
+            "fbeenhakker",
+            "rvisser"
+        ]
+    },
+    {
+        "DistinguishedName": "OU=Staf,OU=CHAfdelingen,DC=AC8-CoeHod,DC=int",
+        "Name": "Staf",
+        "GroupCategory": "Security",
+        "GroupScope": "Global",
+        "Manager": "jdewit",
+        "Members": [
+            "jdewit",
+            "ddevos",
+            "pdijk"
+        ]
     }
-
 ]

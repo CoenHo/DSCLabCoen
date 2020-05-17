@@ -379,17 +379,17 @@
             DependsOn       = '[file]staf'
         }
         FileSystemAccessRule 'AddRightChangeDirectie' {
-            Path     = 'x:\data\eerste\Directie'
+            Path     = 'x:\data\eerste\staf\Directie'
             Identity = "$($dcdata.NetbiosName)\Directie"
             Rights   = @('ChangePermissions')
         }
         FileSystemAccessRule 'AddRightChangeDirectie1' {
-            Path     = 'x:\data\eerste\Directie'
+            Path     = 'x:\data\eerste\staf\Directie'
             Identity = "$($dcdata.NetbiosName)\Staf"
             Rights   = @('ChangePermissions')
         }
         FileSystemAccessRule 'AddRightChangeDirectie2' {
-            Path     = 'x:\data\eerste\Directie'
+            Path     = 'x:\data\eerste\staf\Directie'
             Identity = "$($dcdata.NetbiosName)\Administratie"
             Rights   = @('Read')
         }
@@ -421,17 +421,33 @@
             Path     = 'x:\data\eerste\Administratie'
             Identity = "$($dcdata.NetbiosName)\Staf"
             Rights   = @('ChangePermissions')
+            DependsOn = '[cNtfsPermissionsInheritance]DisableInheritanceAdministratie'
         }
         FileSystemAccessRule 'AddRightReadAdministratie' {
             Path     = 'x:\data\eerste\Administratie'
             Identity = "$($dcdata.NetbiosName)\Administratie"
             Rights   = @('Read')
+            DependsOn = '[cNtfsPermissionsInheritance]DisableInheritanceAdministratie'
         }
         FileSystemAccessRule 'RemoveUsersAdministratie' {
             Path     = 'x:\data\eerste\Administratie'
             Identity = "$($dcdata.NetbiosName)\Users"
             Ensure = 'Absent'
+            DependsOn = '[cNtfsPermissionsInheritance]DisableInheritanceAdministratie'
         }
+        FileSystemAccessRule 'RemoveUsersAdministratie' {
+            Path     = 'x:\data\eerste\Administratie'
+            Identity = "$($dcdata.NetbiosName)\Administrators"
+            Rights = @('FullControl')
+            DependsOn = '[cNtfsPermissionsInheritance]DisableInheritanceAdministratie'
+        }
+        cNtfsPermissionsInheritance 'DisableInheritanceAdministratie'
+    {
+        Path = 'x:\data\eerste\Administratie'
+        Enabled = $false
+        PreserveInherited = $false
+        DependsOn = '[File]Administratie'
+    }
 
         file 'Automatisering' {
             Type            = 'Directory'
@@ -468,22 +484,22 @@
             DependsOn       = '[Disk]XVolume'
         }
         FileSystemAccessRule 'AddRightReadVerkoop2' {
-            Path     = 'x:\data\eerste\Verkoop'
+            Path     = 'X:\Data\Tweede\Verkoop'
             Identity = "$($dcdata.NetbiosName)\Verkoop"
             Rights   = @('ChangePermissions')
         }
         FileSystemAccessRule 'AddRightChangeVerkoop' {
-            Path     = 'x:\data\eerste\Verkoop'
+            Path     = 'X:\Data\Tweede\Verkoop'
             Identity = "$($dcdata.NetbiosName)\Directie"
             Rights   = @('Read')
         }
         FileSystemAccessRule 'AddRightChangeVerkoop1' {
-            Path     = 'x:\data\eerste\Verkoop'
+            Path     = 'X:\Data\Tweede\Verkoop'
             Identity = "$($dcdata.NetbiosName)\Staf"
             Rights   = @('Read')
         }
         FileSystemAccessRule 'RemoveUsersVerkoop' {
-            Path     = 'x:\data\eerste\Verkoop'
+            Path     = 'X:\Data\Tweede\Verkoop'
             Identity = "$($dcdata.NetbiosName)\Users"
             Ensure = 'Absent'
         }
@@ -494,27 +510,27 @@
             DependsOn       = '[Disk]XVolume'
         }
         FileSystemAccessRule 'AddRightChangeProductie' {
-            Path     = 'x:\data\eerste\Productie'
+            Path     = 'X:\Data\Tweede\Productie'
             Identity = "$($dcdata.NetbiosName)\Directie"
             Rights   = @('Read')
         }
         FileSystemAccessRule 'AddRightChangeProductie1' {
-            Path     = 'x:\data\eerste\Productie'
+            Path     = 'X:\Data\Tweede\Productie'
             Identity = "$($dcdata.NetbiosName)\Staf"
             Rights   = @('Read')
         }
         FileSystemAccessRule 'AddRightReadProductie2' {
-            Path     = 'x:\data\eerste\Productie'
+            Path     = 'X:\Data\Tweede\Productie'
             Identity = "$($dcdata.NetbiosName)\Productie"
             Rights   = @('ChangePermissions')
         }
         FileSystemAccessRule 'AddRightFullControlProductie3' {
-            Path     = 'x:\data\eerste\Productie'
+            Path     = 'X:\Data\Tweede\Productie'
             Identity = "$($dcdata.NetbiosName)\Fabricage"
             Rights   = @('Read')
         }
         FileSystemAccessRule 'RemoveUsersProductie' {
-            Path     = 'x:\data\eerste\Productie'
+            Path     = 'X:\Data\Tweede\Productie'
             Identity = "$($dcdata.NetbiosName)\Users"
             Ensure = 'Absent'
         }
@@ -525,27 +541,27 @@
             DependsOn       = '[file]productie'
         }
         FileSystemAccessRule 'AddRightChangeFabricage' {
-            Path     = 'x:\data\eerste\Fabricage'
+            Path     = 'X:\Data\Tweede\Productie\Fabricage'
             Identity = "$($dcdata.NetbiosName)\Directie"
             Rights   = @('Read')
         }
         FileSystemAccessRule 'AddRightChangeFabricage1' {
-            Path     = 'x:\data\eerste\Fabricage'
+            Path     = 'X:\Data\Tweede\Productie\Fabricage'
             Identity = "$($dcdata.NetbiosName)\Staf"
             Rights   = @('Read')
         }
         FileSystemAccessRule 'AddRightReadAFabricage2' {
-            Path     = 'x:\data\eerste\Fabricage'
+            Path     = 'X:\Data\Tweede\Productie\Fabricage'
             Identity = "$($dcdata.NetbiosName)\Productie"
             Rights   = @('ChangePermissions')
         }
         FileSystemAccessRule 'AddRightFullControlFabricage3' {
-            Path     = 'x:\data\eerste\Fabricage'
+            Path     = 'X:\Data\Tweede\Productie\Fabricage'
             Identity = "$($dcdata.NetbiosName)\Fabricage"
             Rights   = @('ChangePermissions')
         }
         FileSystemAccessRule 'RemoveUsersFabricage' {
-            Path     = 'x:\data\eerste\Fabricage'
+            Path     = 'X:\Data\Tweede\Productie\Fabricage'
             Identity = "$($dcdata.NetbiosName)\Users"
             Ensure = 'Absent'
         }
@@ -556,18 +572,18 @@
             DependsOn       = '[Disk]XVolume'
         }
         FileSystemAccessRule 'AddRightChangeAlgemeen' {
-            Path     = 'x:\data\eerste\Algemeen'
+            Path     = 'x:\data\tweede\Algemeen'
             Identity = "$($dcdata.NetbiosName)\Directie"
             Rights   = @('ChangePermissions')
         }
         FileSystemAccessRule 'AddRightChangeAlgemeen1' {
-            Path     = 'x:\data\eerste\Algemeen'
+            Path     = 'x:\data\tweede\Algemeen'
             Identity = "$($dcdata.NetbiosName)\Administratie"
             Rights   = @('ChangePermissions')
         }
         
         FileSystemAccessRule 'AddRightFullControlAlgemeen3' {
-            Path     = 'x:\data\eerste\Algemeen'
+            Path     = 'x:\data\tweede\Algemeen'
             Identity = "$($dcdata.NetbiosName)\Automatisering"
             Rights   = @('FullControl')
         }
