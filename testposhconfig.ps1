@@ -83,7 +83,7 @@
 
     }#end allnodes
 
-    #Region FirstDC
+    #region FirstDC
     
     node $AllNodes.Where{ $_.Role -eq 'FirstDC' }.NodeName
     {
@@ -179,20 +179,23 @@
                 PasswordNeverExpires   = $True
                 DependsOn              = '[ADDomain]FirstDC'
                 PasswordAuthentication = 'Negotiate'
+                HomeDrive              = 'H:'
+                HomeDirectory          = "\\poshdc1\UserFolders\$($user.Account)"
+                ProfilePath            = "\\poshdc1\UserProfiles\$($user.Account)"
             }
         } #user
 
         #region groups
         Foreach ($group in $groups) {
-           ADgroup $group.name {
-                    Path       = $group.DistinguishedName
-                    GroupName  = $group.name
-                    Category   = $group.GroupCategory
-                    GroupScope = $group.GroupScope
-                    DependsOn  = '[ADDomain]FirstDC'
-                    Members    = $group.Members
-                    ManagedBy = $group.Manager
-                }
+            ADgroup $group.name {
+                Path       = $group.DistinguishedName
+                GroupName  = $group.name
+                Category   = $group.GroupCategory
+                GroupScope = $group.GroupScope
+                DependsOn  = '[ADDomain]FirstDC'
+                Members    = $group.Members
+                ManagedBy  = $group.Manager
+            }
         }# end region groups
         ADGroup DomainAdmin {
             GroupName        = 'Domain Admins'
@@ -210,7 +213,8 @@
             DependsOn        = '[ADGroup]Automatisering'
         }
         
-    }#End Region firstdc
+    }
+    #endregion firstdc
     
     
     #region SecondDC
@@ -258,11 +262,10 @@
             }
         }# End foreach
 
-        Script 'Routing'
-        {
-            SetScript = {powershell.exe c:\ConfigFiles\Routing.ps1}
-            TestScript = {$false}
-            GetScript = { <# Do Nothing #> }
+        Script 'Routing' {
+            SetScript  = { powershell.exe c:\ConfigFiles\Routing.ps1 }
+            TestScript = { $false }
+            GetScript  = { <# Do Nothing #> }
             DependsOn  = '[Windowsfeature]Routing'
         }
     }# End region FS
@@ -274,35 +277,35 @@
             ExecutionPolicyScope = 'Localmachine'
             ExecutionPolicy      = 'Remotesigned'
         }
-       # Adds RSAT which is now a Windows Capability in Windows 10    
-            Script RSAT {
-                TestScript = {
-                    $packages = Get-WindowsCapability -online -Name Rsat*
-                    if ($packages.state -match "Installed") {
-                        Return $True
-                    }
-                    else {
-                        Return $False
-                    }
+        # Adds RSAT which is now a Windows Capability in Windows 10    
+        Script RSAT {
+            TestScript = {
+                $packages = Get-WindowsCapability -online -Name Rsat*
+                if ($packages.state -match "Installed") {
+                    Return $True
                 }
-    
-                GetScript  = {
-                    $packages = Get-WindowsCapability -online -Name Rsat* | Select-Object Displayname, State
-                    $installed = $packages.Where( { $_.state -eq "Installed" })
-                    Return @{Result = "$($installed.count)/$($packages.count) RSAT features installed" }
-                }
-    
-                SetScript  = {
-                    Get-WindowsCapability -online -Name Rsat* | Where-Object { $_.state -ne "installed" } | Add-WindowsCapability -online
+                else {
+                    Return $False
                 }
             }
     
-            #since RSAT is added to the client go ahead and create a Scripts folder
-            File scripts {
-                DestinationPath = 'C:\Scripts'
-                Ensure          = 'present'
-                type            = 'directory'
+            GetScript  = {
+                $packages = Get-WindowsCapability -online -Name Rsat* | Select-Object Displayname, State
+                $installed = $packages.Where( { $_.state -eq "Installed" })
+                Return @{Result = "$($installed.count)/$($packages.count) RSAT features installed" }
             }
+    
+            SetScript  = {
+                Get-WindowsCapability -online -Name Rsat* | Where-Object { $_.state -ne "installed" } | Add-WindowsCapability -online
+            }
+        }
+    
+        #since RSAT is added to the client go ahead and create a Scripts folder
+        File scripts {
+            DestinationPath = 'C:\Scripts'
+            Ensure          = 'present'
+            type            = 'directory'
+        }
     }# End region Client
 
     #region DomainJoin config
@@ -344,7 +347,7 @@
             DiskId      = 1
             DriveLetter = 'Z'
             FSLabel     = 'Data'
-            DependsOn   = '[Disk]XVolume'
+            DependsOn   = '[WaitForDisk]Disk1'
         }
 
         file 'eerste' {
@@ -371,222 +374,593 @@
             Ensure          = "Present"
             DependsOn       = '[Disk]ZVolume'
         }
+        #region Homefolders
+        if (($node.nodename) -eq 'POSHDC1') {
+            $users = get-content "C:\Users\chodz\Documents\github\DSCLabCoen\AD-users.json" | ConvertFrom-Json
+            $parentpath = "z:\users\home"
 
-        file 'Directie' {
-            Type            = 'Directory'
-            DestinationPath = 'x:\data\eerste\staf\Directie'
-            Ensure          = "Present"
-            DependsOn       = '[file]staf'
+            foreach ($user in $users) {
+                $path = "$parentpath\$($user.account)"
+                File $user.Account {
+                    DestinationPath = $path
+                    Type            = 'Directory'
+                    Dependson       = '[Disk]ZVolume'
+                }
+                cNtfsPermissionsInheritance "DisableInheritance$($user.Account)" {
+                    Path              = $Path
+                    Enabled           = $false
+                    PreserveInherited = $false
+                    DependsOn         = "[File]$($user.Account)"
+                }
+                cNtfsPermissionEntry "PermissionSet$($user.Account)" {
+                    Ensure                   = 'Present'
+                    Path                     = $Path
+                    Principal                = "$($dcdata.NetbiosName)\$($user.Account)"
+                    AccessControlInformation = @(
+                        cNtfsAccessControlInformation {
+                            AccessControlType  = 'Allow'
+                            FileSystemRights   = 'Modify'
+                            Inheritance        = 'ThisFolderSubfoldersAndFiles'
+                            NoPropagateInherit = $false
+                        }
+                    )
+                    DependsOn                = "[File]$($user.Account)"
+                }
+                # Ensure that multiple permission entries are assigned to the local 'Administrators' group.
+                cNtfsPermissionEntry "Administrator$($user.Account)" {
+                    Ensure                   = 'Present'
+                    Path                     = $Path
+                    Principal                = 'BUILTIN\Administrators'
+                    AccessControlInformation = @(                
+                        cNtfsAccessControlInformation {
+                            AccessControlType  = 'Allow'
+                            FileSystemRights   = 'FullControl'
+                            Inheritance        = 'ThisFolderSubfoldersAndFiles'
+                            NoPropagateInherit = $false
+                        }                
+                    )
+                    DependsOn                = "[File]$($user.Account)"
+                }
+                # Ensure that multiple permission entries are assigned to the local 'Administrators' group.
+                cNtfsPermissionEntry "Automatisering$($user.Account)" {
+                    Ensure                   = 'Present'
+                    Path                     = $Path
+                    Principal                = "$($dcdata.NetbiosName)\Automatisering"
+                    AccessControlInformation = @(                
+                        cNtfsAccessControlInformation {
+                            AccessControlType  = 'Allow'
+                            FileSystemRights   = 'FullControl'
+                            Inheritance        = 'ThisFolderSubfoldersAndFiles'
+                            NoPropagateInherit = $false
+                        }                
+                    )
+                    DependsOn                = "[File]$($user.Account)"
+                }
+            }#end foreach users
         }
-        FileSystemAccessRule 'AddRightChangeDirectie' {
-            Path     = 'x:\data\eerste\staf\Directie'
-            Identity = "$($dcdata.NetbiosName)\Directie"
-            Rights   = @('ChangePermissions')
-        }
-        FileSystemAccessRule 'AddRightChangeDirectie1' {
-            Path     = 'x:\data\eerste\staf\Directie'
-            Identity = "$($dcdata.NetbiosName)\Staf"
-            Rights   = @('ChangePermissions')
-        }
-        FileSystemAccessRule 'AddRightChangeDirectie2' {
-            Path     = 'x:\data\eerste\staf\Directie'
-            Identity = "$($dcdata.NetbiosName)\Administratie"
-            Rights   = @('Read')
-        }
-        
-        file 'staf' {
+        #endregion Homefolders
+        #region Directie
+        file 'Staf' {
             Type            = 'Directory'
             DestinationPath = 'x:\data\eerste\Staf'
             Ensure          = "Present"
             DependsOn       = '[Disk]XVolume'
         }
-        FileSystemAccessRule 'AddRightChangeStaf' {
-            Path     = 'x:\data\eerste\Staf'
-            Identity = "$($dcdata.NetbiosName)\Directie"
-            Rights   = @('ChangePermissions')
-        }
-        FileSystemAccessRule 'AddRightChangeStaf1' {
-            Path     = 'x:\data\eerste\Staf'
-            Identity = "$($dcdata.NetbiosName)\Staf"
-            Rights   = @('ChangePermissions')
-        }
-        
-        file 'administratie' {
+        $Path = 'x:\data\eerste\staf\Directie'
+        file 'Directie' {
             Type            = 'Directory'
-            DestinationPath = 'x:\data\eerste\Administratie'
+            DestinationPath = $Path
+            Ensure          = "Present"
+            DependsOn       = '[file]Staf'
+        }
+        cNtfsPermissionsInheritance DisableInheritanceDirectie {
+            Path              = $Path
+            Enabled           = $false
+            PreserveInherited = $false
+            DependsOn         = '[File]Directie'
+        }
+        cNtfsPermissionEntry PermissionSetDirectie1 {
+            Ensure                   = 'Present'
+            Path                     = $Path
+            Principal                = "$($dcdata.NetbiosName)\Directie"
+            AccessControlInformation = @(
+                cNtfsAccessControlInformation {
+                    AccessControlType  = 'Allow'
+                    FileSystemRights   = 'Modify'
+                    Inheritance        = 'ThisFolderSubfoldersAndFiles'
+                    NoPropagateInherit = $false
+                }
+            )
+            DependsOn                = '[File]Directie'
+        }
+        cNtfsPermissionEntry PermissionSetDirectie2 {
+            Ensure                   = 'Present'
+            Path                     = $Path
+            Principal                = "$($dcdata.NetbiosName)\Staf"
+            AccessControlInformation = @(
+                cNtfsAccessControlInformation {
+                    AccessControlType  = 'Allow'
+                    FileSystemRights   = 'Modify'
+                    Inheritance        = 'ThisFolderSubfoldersAndFiles'
+                    NoPropagateInherit = $false
+                }
+            )
+            DependsOn                = '[File]Directie'
+        }
+        cNtfsPermissionEntry PermissionSetDirectie3 {
+            Ensure                   = 'Present'
+            Path                     = $Path
+            Principal                = "$($dcdata.NetbiosName)\Administratie"
+            AccessControlInformation = @(
+                cNtfsAccessControlInformation {
+                    AccessControlType  = 'Allow'
+                    FileSystemRights   = 'ReadAndExecute'
+                    Inheritance        = 'ThisFolderSubfoldersAndFiles'
+                    NoPropagateInherit = $false
+                }
+            )
+            DependsOn                = '[File]Directie'
+        }
+        cNtfsPermissionEntry PermissionSetDirectie4 {
+            Ensure                   = 'Present'
+            Path                     = $Path
+            Principal                = "$($dcdata.NetbiosName)\Automatisering"
+            AccessControlInformation = @(
+                cNtfsAccessControlInformation {
+                    AccessControlType  = 'Allow'
+                    FileSystemRights   = 'FullControl'
+                    Inheritance        = 'ThisFolderSubfoldersAndFiles'
+                    NoPropagateInherit = $false
+                }
+            )
+            DependsOn                = '[File]Directie'
+        }
+        #endregion Directie
+        #region Administratie
+        $Path = 'x:\data\eerste\Administratie'
+        file 'Administratie' {
+            Type            = 'Directory'
+            DestinationPath = $Path
             Ensure          = "Present"
             DependsOn       = '[Disk]XVolume'
         }
-        FileSystemAccessRule 'AddRightChangeAdministratie' {
-            Path     = 'x:\data\eerste\Administratie'
-            Identity = "$($dcdata.NetbiosName)\Staf"
-            Rights   = @('ChangePermissions')
-            DependsOn = '[cNtfsPermissionsInheritance]DisableInheritanceAdministratie'
+        cNtfsPermissionsInheritance 'DisableInheritanceAdministratie' {
+            Path              = $Path
+            Enabled           = $false
+            PreserveInherited = $false
+            DependsOn         = '[File]Administratie'
         }
-        FileSystemAccessRule 'AddRightReadAdministratie' {
-            Path     = 'x:\data\eerste\Administratie'
-            Identity = "$($dcdata.NetbiosName)\Administratie"
-            Rights   = @('Read')
-            DependsOn = '[cNtfsPermissionsInheritance]DisableInheritanceAdministratie'
+        cNtfsPermissionEntry PermissionSetAdministratie1 {
+            Ensure                   = 'Present'
+            Path                     = $Path
+            Principal                = "$($dcdata.NetbiosName)\Staf"
+            AccessControlInformation = @(
+                cNtfsAccessControlInformation {
+                    AccessControlType  = 'Allow'
+                    FileSystemRights   = 'Modify'
+                    Inheritance        = 'ThisFolderSubfoldersAndFiles'
+                    NoPropagateInherit = $false
+                }
+            )
+            DependsOn                = '[File]Administratie'
         }
-        FileSystemAccessRule 'RemoveUsersAdministratie' {
-            Path     = 'x:\data\eerste\Administratie'
-            Identity = "$($dcdata.NetbiosName)\Users"
-            Ensure = 'Absent'
-            DependsOn = '[cNtfsPermissionsInheritance]DisableInheritanceAdministratie'
+        cNtfsPermissionEntry PermissionSetAdministratie2 {
+            Ensure                   = 'Present'
+            Path                     = $Path
+            Principal                = "$($dcdata.NetbiosName)\Administratie"
+            AccessControlInformation = @(
+                cNtfsAccessControlInformation {
+                    AccessControlType  = 'Allow'
+                    FileSystemRights   = 'ReadAndExecute'
+                    Inheritance        = 'ThisFolderSubfoldersAndFiles'
+                    NoPropagateInherit = $false
+                }
+            )
+            DependsOn                = '[File]Administratie'
         }
-        FileSystemAccessRule 'RemoveUsersAdministratie' {
-            Path     = 'x:\data\eerste\Administratie'
-            Identity = "$($dcdata.NetbiosName)\Administrators"
-            Rights = @('FullControl')
-            DependsOn = '[cNtfsPermissionsInheritance]DisableInheritanceAdministratie'
+        cNtfsPermissionEntry PermissionSetAdministratie3 {
+            Ensure                   = 'Present'
+            Path                     = $Path
+            Principal                = "$($dcdata.NetbiosName)\Automatisering"
+            AccessControlInformation = @(
+                cNtfsAccessControlInformation {
+                    AccessControlType  = 'Allow'
+                    FileSystemRights   = 'FullControl'
+                    Inheritance        = 'ThisFolderSubfoldersAndFiles'
+                    NoPropagateInherit = $false
+                }
+            )
+            DependsOn                = '[File]Administratie'
         }
-        cNtfsPermissionsInheritance 'DisableInheritanceAdministratie'
-    {
-        Path = 'x:\data\eerste\Administratie'
-        Enabled = $false
-        PreserveInherited = $false
-        DependsOn = '[File]Administratie'
-    }
-
+        #endregion Administratie
+        
+        #region Automatisering
+        $Path = 'x:\data\eerste\Automatisering'
         file 'Automatisering' {
             Type            = 'Directory'
-            DestinationPath = 'x:\data\eerste\Automatisering'
+            DestinationPath = $Path
             Ensure          = "Present"
             DependsOn       = '[Disk]XVolume'
         }
-        FileSystemAccessRule 'AddRightFullControlAutomatisering' {
-            Path     = 'x:\data\eerste\Automatisering'
-            Identity = "$($dcdata.NetbiosName)\Automatisering"
-            Rights   = @('FullControl')
+        cNtfsPermissionsInheritance DisableInheritanceAutomatisering {
+            Path              = $Path
+            Enabled           = $false
+            PreserveInherited = $false
+            DependsOn         = '[File]Automatisering'
         }
-        FileSystemAccessRule 'RemoveUsersAutomatisering' {
-            Path     = 'x:\data\eerste\Automatisering'
-            Identity = "$($dcdata.NetbiosName)\Users"
-            Ensure = 'Absent'
+        cNtfsPermissionEntry PermissionSetAutomatisering1 {
+            Ensure                   = 'Present'
+            Path                     = $Path
+            Principal                = "$($dcdata.NetbiosName)\Automatisering"
+            AccessControlInformation = @(
+                cNtfsAccessControlInformation {
+                    AccessControlType  = 'Allow'
+                    FileSystemRights   = 'FullControl'
+                    Inheritance        = 'ThisFolderSubfoldersAndFiles'
+                    NoPropagateInherit = $false
+                }
+            )
+            DependsOn                = '[File]Automatisering'
         }
+        #endregion Automatisering
+        #region Software
+        $Path = 'X:\data\eerste\Software'
         file 'Software' {
             Type            = 'Directory'
-            DestinationPath = 'x:\data\eerste\Software'
+            DestinationPath = $Path
             Ensure          = "Present"
             DependsOn       = '[Disk]XVolume'
         }
-        FileSystemAccessRule 'AddRightReadSoftware1' {
-            Path     = 'x:\data\eerste\Software'
-            Identity = "$($dcdata.NetbiosName)\Automatisering"
-            Rights   = @('FullControl')
+        cNtfsPermissionsInheritance 'DisableInheritanceSoftware' {
+            Path              = $Path
+            Enabled           = $false
+            PreserveInherited = $false
+            DependsOn         = '[File]Software'
         }
-        
+        cNtfsPermissionEntry PermissionSetSoftware1 {
+            Ensure                   = 'Present'
+            Path                     = $Path
+            Principal                = "Builtin\Users"
+            AccessControlInformation = @(
+                cNtfsAccessControlInformation {
+                    AccessControlType  = 'Allow'
+                    FileSystemRights   = 'ReadAndExecute'
+                    Inheritance        = 'ThisFolderSubfoldersAndFiles'
+                    NoPropagateInherit = $false
+                }
+            )
+            DependsOn                = '[File]Administratie'
+        }
+        cNtfsPermissionEntry PermissionSetSoftware2 {
+            Ensure                   = 'Present'
+            Path                     = $Path
+            Principal                = "$($dcdata.NetbiosName)\Automatisering"
+            AccessControlInformation = @(
+                cNtfsAccessControlInformation {
+                    AccessControlType  = 'Allow'
+                    FileSystemRights   = 'FullControl'
+                    Inheritance        = 'ThisFolderSubfoldersAndFiles'
+                    NoPropagateInherit = $false
+                }
+            )
+            DependsOn                = '[File]Administratie'
+        }
+        #endregion Software
+        #region Verkoop
+        $Path = 'X:\Data\Tweede\Verkoop'
         file 'Verkoop' {
             Type            = 'Directory'
-            DestinationPath = 'X:\Data\Tweede\Verkoop'
+            DestinationPath = $Path
             Ensure          = "Present"
             DependsOn       = '[Disk]XVolume'
         }
-        FileSystemAccessRule 'AddRightReadVerkoop2' {
-            Path     = 'X:\Data\Tweede\Verkoop'
-            Identity = "$($dcdata.NetbiosName)\Verkoop"
-            Rights   = @('ChangePermissions')
+        cNtfsPermissionsInheritance 'DisableInheritanceVerkoop' {
+            Path              = $Path
+            Enabled           = $false
+            PreserveInherited = $false
+            DependsOn         = '[File]Verkoop'
         }
-        FileSystemAccessRule 'AddRightChangeVerkoop' {
-            Path     = 'X:\Data\Tweede\Verkoop'
-            Identity = "$($dcdata.NetbiosName)\Directie"
-            Rights   = @('Read')
+        cNtfsPermissionEntry PermissionSetVerkoop1 {
+            Ensure                   = 'Present'
+            Path                     = $Path
+            Principal                = "$($dcdata.NetbiosName)\Directie"
+            AccessControlInformation = @(
+                cNtfsAccessControlInformation {
+                    AccessControlType  = 'Allow'
+                    FileSystemRights   = 'ReadAndExecute'
+                    Inheritance        = 'ThisFolderSubfoldersAndFiles'
+                    NoPropagateInherit = $false
+                }
+            )
+            DependsOn                = '[File]Verkoop'
         }
-        FileSystemAccessRule 'AddRightChangeVerkoop1' {
-            Path     = 'X:\Data\Tweede\Verkoop'
-            Identity = "$($dcdata.NetbiosName)\Staf"
-            Rights   = @('Read')
+        cNtfsPermissionEntry PermissionSetVerkoop2 {
+            Ensure                   = 'Present'
+            Path                     = $Path
+            Principal                = "$($dcdata.NetbiosName)\Staf"
+            AccessControlInformation = @(
+                cNtfsAccessControlInformation {
+                    AccessControlType  = 'Allow'
+                    FileSystemRights   = 'ReadAndExecute'
+                    Inheritance        = 'ThisFolderSubfoldersAndFiles'
+                    NoPropagateInherit = $false
+                }
+            )
+            DependsOn                = '[File]Verkoop'
         }
-        FileSystemAccessRule 'RemoveUsersVerkoop' {
-            Path     = 'X:\Data\Tweede\Verkoop'
-            Identity = "$($dcdata.NetbiosName)\Users"
-            Ensure = 'Absent'
+        cNtfsPermissionEntry PermissionSetVerkoop3 {
+            Ensure                   = 'Present'
+            Path                     = $Path
+            Principal                = "$($dcdata.NetbiosName)\Verkoop"
+            AccessControlInformation = @(
+                cNtfsAccessControlInformation {
+                    AccessControlType  = 'Allow'
+                    FileSystemRights   = 'Modify'
+                    Inheritance        = 'ThisFolderSubfoldersAndFiles'
+                    NoPropagateInherit = $false
+                }
+            )
+            DependsOn                = '[File]Verkoop'
         }
-        file 'productie' {
+        # Ensure that multiple permission entries are assigned to the local 'Administrators' group.
+        cNtfsPermissionEntry PermissionSetVerkoop {
+            Ensure                   = 'Present'
+            Path                     = $Path
+            Principal                = "$($dcdata.NetbiosName)\Automatisering"
+            AccessControlInformation = @(
+                cNtfsAccessControlInformation {
+                    AccessControlType  = 'Allow'
+                    FileSystemRights   = 'FullControl'
+                    Inheritance        = 'ThisFolderSubfoldersAndFiles'
+                    NoPropagateInherit = $false
+                }
+            )
+            DependsOn                = '[File]Verkoop'
+        }
+        #endregion Verkoop
+        #region Productie
+        $Path = 'X:\Data\Tweede\Productie'
+        file 'Productie' {
             Type            = 'Directory'
-            DestinationPath = 'X:\Data\Tweede\Productie'
+            DestinationPath = $Path
             Ensure          = "Present"
             DependsOn       = '[Disk]XVolume'
         }
-        FileSystemAccessRule 'AddRightChangeProductie' {
-            Path     = 'X:\Data\Tweede\Productie'
-            Identity = "$($dcdata.NetbiosName)\Directie"
-            Rights   = @('Read')
+        cNtfsPermissionsInheritance 'DisableInheritanceProductie' {
+            Path              = $Path
+            Enabled           = $false
+            PreserveInherited = $false
+            DependsOn         = '[File]Productie'
         }
-        FileSystemAccessRule 'AddRightChangeProductie1' {
-            Path     = 'X:\Data\Tweede\Productie'
-            Identity = "$($dcdata.NetbiosName)\Staf"
-            Rights   = @('Read')
+        cNtfsPermissionEntry PermissionSetProductie1 {
+            Ensure                   = 'Present'
+            Path                     = $Path
+            Principal                = "$($dcdata.NetbiosName)\Productie"
+            AccessControlInformation = @(
+                cNtfsAccessControlInformation {
+                    AccessControlType  = 'Allow'
+                    FileSystemRights   = 'Modify'
+                    Inheritance        = 'ThisFolderSubfoldersAndFiles'
+                    NoPropagateInherit = $false
+                }
+            )
+            DependsOn                = '[File]Productie'
         }
-        FileSystemAccessRule 'AddRightReadProductie2' {
-            Path     = 'X:\Data\Tweede\Productie'
-            Identity = "$($dcdata.NetbiosName)\Productie"
-            Rights   = @('ChangePermissions')
+        cNtfsPermissionEntry PermissionSetProductie2 {
+            Ensure                   = 'Present'
+            Path                     = $Path
+            Principal                = "$($dcdata.NetbiosName)\Fabricage"
+            AccessControlInformation = @(
+                cNtfsAccessControlInformation {
+                    AccessControlType  = 'Allow'
+                    FileSystemRights   = 'ReadAndExecute'
+                    Inheritance        = 'ThisFolderSubfoldersAndFiles'
+                    NoPropagateInherit = $false
+                }
+            )
+            DependsOn                = '[File]Productie'
         }
-        FileSystemAccessRule 'AddRightFullControlProductie3' {
-            Path     = 'X:\Data\Tweede\Productie'
-            Identity = "$($dcdata.NetbiosName)\Fabricage"
-            Rights   = @('Read')
+        cNtfsPermissionEntry PermissionSetProductie3 {
+            Ensure                   = 'Present'
+            Path                     = $Path
+            Principal                = "$($dcdata.NetbiosName)\Directie"
+            AccessControlInformation = @(
+                cNtfsAccessControlInformation {
+                    AccessControlType  = 'Allow'
+                    FileSystemRights   = 'ReadAndExecute'
+                    Inheritance        = 'ThisFolderSubfoldersAndFiles'
+                    NoPropagateInherit = $false
+                }
+            )
+            DependsOn                = '[File]Productie'
         }
-        FileSystemAccessRule 'RemoveUsersProductie' {
-            Path     = 'X:\Data\Tweede\Productie'
-            Identity = "$($dcdata.NetbiosName)\Users"
-            Ensure = 'Absent'
+        cNtfsPermissionEntry PermissionSetProductie4 {
+            Ensure                   = 'Present'
+            Path                     = $Path
+            Principal                = "$($dcdata.NetbiosName)\Staf"
+            AccessControlInformation = @(
+                cNtfsAccessControlInformation {
+                    AccessControlType  = 'Allow'
+                    FileSystemRights   = 'ReadAndExecute'
+                    Inheritance        = 'ThisFolderSubfoldersAndFiles'
+                    NoPropagateInherit = $false
+                }
+            )
+            DependsOn                = '[File]Productie'
         }
-        file 'fabricage' {
+        # Ensure that multiple permission entries are assigned to the local 'Administrators' group.
+        cNtfsPermissionEntry PermissionSetProductie {
+            Ensure                   = 'Present'
+            Path                     = $Path
+            Principal                = "$($dcdata.NetbiosName)\Automatisering"
+            AccessControlInformation = @(
+                cNtfsAccessControlInformation {
+                    AccessControlType  = 'Allow'
+                    FileSystemRights   = 'FullControl'
+                    Inheritance        = 'ThisFolderSubfoldersAndFiles'
+                    NoPropagateInherit = $false
+                }
+            )
+            DependsOn                = '[File]Productie'
+        }
+        #endregion Productie
+        #region Fabricage
+        $Path = 'X:\Data\Tweede\Productie\Fabricage'
+        file 'Fabricage' {
             Type            = 'Directory'
-            DestinationPath = 'X:\Data\Tweede\Productie\Fabricage'
+            DestinationPath = $Path
             Ensure          = "Present"
             DependsOn       = '[file]productie'
         }
-        FileSystemAccessRule 'AddRightChangeFabricage' {
-            Path     = 'X:\Data\Tweede\Productie\Fabricage'
-            Identity = "$($dcdata.NetbiosName)\Directie"
-            Rights   = @('Read')
+        cNtfsPermissionsInheritance 'DisableInheritancePFabricage' {
+            Path              = $Path
+            Enabled           = $false
+            PreserveInherited = $false
+            DependsOn         = '[File]Fabricage'
         }
-        FileSystemAccessRule 'AddRightChangeFabricage1' {
-            Path     = 'X:\Data\Tweede\Productie\Fabricage'
-            Identity = "$($dcdata.NetbiosName)\Staf"
-            Rights   = @('Read')
+        cNtfsPermissionEntry PermissionSetFabricage1 {
+            Ensure                   = 'Present'
+            Path                     = $Path
+            Principal                = "$($dcdata.NetbiosName)\Productie"
+            AccessControlInformation = @(
+                cNtfsAccessControlInformation {
+                    AccessControlType  = 'Allow'
+                    FileSystemRights   = 'Modify'
+                    Inheritance        = 'ThisFolderSubfoldersAndFiles'
+                    NoPropagateInherit = $false
+                }
+            )
+            DependsOn                = '[File]Fabricage'
         }
-        FileSystemAccessRule 'AddRightReadAFabricage2' {
-            Path     = 'X:\Data\Tweede\Productie\Fabricage'
-            Identity = "$($dcdata.NetbiosName)\Productie"
-            Rights   = @('ChangePermissions')
+        cNtfsPermissionEntry PermissionSetFabricage2 {
+            Ensure                   = 'Present'
+            Path                     = $Path
+            Principal                = "$($dcdata.NetbiosName)\Fabricage"
+            AccessControlInformation = @(
+                cNtfsAccessControlInformation {
+                    AccessControlType  = 'Allow'
+                    FileSystemRights   = 'Modify'
+                    Inheritance        = 'ThisFolderSubfoldersAndFiles'
+                    NoPropagateInherit = $false
+                }
+            )
+            DependsOn                = '[File]Fabricage'
         }
-        FileSystemAccessRule 'AddRightFullControlFabricage3' {
-            Path     = 'X:\Data\Tweede\Productie\Fabricage'
-            Identity = "$($dcdata.NetbiosName)\Fabricage"
-            Rights   = @('ChangePermissions')
+        cNtfsPermissionEntry PermissionSetFabricage3 {
+            Ensure                   = 'Present'
+            Path                     = $Path
+            Principal                = "$($dcdata.NetbiosName)\Directie"
+            AccessControlInformation = @(
+                cNtfsAccessControlInformation {
+                    AccessControlType  = 'Allow'
+                    FileSystemRights   = 'ReadAndExecute'
+                    Inheritance        = 'ThisFolderSubfoldersAndFiles'
+                    NoPropagateInherit = $false
+                }
+            )
+            DependsOn                = '[File]Fabricage'
         }
-        FileSystemAccessRule 'RemoveUsersFabricage' {
-            Path     = 'X:\Data\Tweede\Productie\Fabricage'
-            Identity = "$($dcdata.NetbiosName)\Users"
-            Ensure = 'Absent'
+        cNtfsPermissionEntry PermissionSetFabricage4 {
+            Ensure                   = 'Present'
+            Path                     = $Path
+            Principal                = "$($dcdata.NetbiosName)\Staf"
+            AccessControlInformation = @(
+                cNtfsAccessControlInformation {
+                    AccessControlType  = 'Allow'
+                    FileSystemRights   = 'ReadAndExecute'
+                    Inheritance        = 'ThisFolderSubfoldersAndFiles'
+                    NoPropagateInherit = $false
+                }
+            )
+            DependsOn                = '[File]Productie'
         }
+        # Ensure that multiple permission entries are assigned to the local 'Administrators' group.
+        cNtfsPermissionEntry PermissionSetFabricage {
+            Ensure                   = 'Present'
+            Path                     = $Path
+            Principal                = "$($dcdata.NetbiosName)\Automatisering"
+            AccessControlInformation = @(
+                cNtfsAccessControlInformation {
+                    AccessControlType  = 'Allow'
+                    FileSystemRights   = 'FullControl'
+                    Inheritance        = 'ThisFolderSubfoldersAndFiles'
+                    NoPropagateInherit = $false
+                }
+            )
+            DependsOn                = '[File]Fabricage'
+        }
+        #endregion Fabricage
+        #region Algemeen
+        $Path = 'X:\Data\Tweede\Algemeen'
         file 'algemeen' {
             Type            = 'Directory'
-            DestinationPath = 'X:\Data\Tweede\Algemeen'
+            DestinationPath = $Path
             Ensure          = "Present"
             DependsOn       = '[Disk]XVolume'
         }
-        FileSystemAccessRule 'AddRightChangeAlgemeen' {
-            Path     = 'x:\data\tweede\Algemeen'
-            Identity = "$($dcdata.NetbiosName)\Directie"
-            Rights   = @('ChangePermissions')
+        cNtfsPermissionsInheritance 'DisableInheritanceAlgemeen' {
+            Path              = $Path
+            Enabled           = $false
+            PreserveInherited = $false
+            DependsOn         = '[File]Algemeen'
         }
-        FileSystemAccessRule 'AddRightChangeAlgemeen1' {
-            Path     = 'x:\data\tweede\Algemeen'
-            Identity = "$($dcdata.NetbiosName)\Administratie"
-            Rights   = @('ChangePermissions')
+        cNtfsPermissionEntry PermissionSetAlgemeen1 {
+            Ensure                   = 'Present'
+            Path                     = $Path
+            Principal                = "BUILTIN\Users"
+            AccessControlInformation = @(
+                cNtfsAccessControlInformation {
+                    AccessControlType  = 'Allow'
+                    FileSystemRights   = 'ReadAndExecute'
+                    Inheritance        = 'ThisFolderSubfoldersAndFiles'
+                    NoPropagateInherit = $false
+                }
+            )
+            DependsOn                = '[File]Algemeen'
         }
-        
-        FileSystemAccessRule 'AddRightFullControlAlgemeen3' {
-            Path     = 'x:\data\tweede\Algemeen'
-            Identity = "$($dcdata.NetbiosName)\Automatisering"
-            Rights   = @('FullControl')
+        cNtfsPermissionEntry PermissionSetAlgemeen2 {
+            Ensure                   = 'Present'
+            Path                     = $Path
+            Principal                = "$($dcdata.NetbiosName)\Directie"
+            AccessControlInformation = @(
+                cNtfsAccessControlInformation {
+                    AccessControlType  = 'Allow'
+                    FileSystemRights   = 'Modify'
+                    Inheritance        = 'ThisFolderSubfoldersAndFiles'
+                    NoPropagateInherit = $false
+                }
+            )
+            DependsOn                = '[File]Algemeen'
         }
+        cNtfsPermissionEntry PermissionSetAlgemeen3 {
+            Ensure                   = 'Present'
+            Path                     = $Path
+            Principal                = "$($dcdata.NetbiosName)\Administratie"
+            AccessControlInformation = @(
+                cNtfsAccessControlInformation {
+                    AccessControlType  = 'Allow'
+                    FileSystemRights   = 'ReadAndExecute'
+                    Inheritance        = 'ThisFolderSubfoldersAndFiles'
+                    NoPropagateInherit = $false
+                }
+            )
+            DependsOn                = '[File]Algemeen'
+        }
+        cNtfsPermissionEntry PermissionSetAlgemeen4 {
+            Ensure                   = 'Present'
+            Path                     = $Path
+            Principal                = "$($dcdata.NetbiosName)\Automatisering"
+            AccessControlInformation = @(
+                cNtfsAccessControlInformation {
+                    AccessControlType  = 'Allow'
+                    FileSystemRights   = 'FullControl'
+                    Inheritance        = 'ThisFolderSubfoldersAndFiles'
+                    NoPropagateInherit = $false
+                }
+            )
+            DependsOn                = '[File]Algemeen'
+        }
+        #endregion Algemeen
 
         SmbShare 'Data1' {
             Name         = 'Data1'
@@ -614,9 +988,32 @@
             Path                = 'z:\users\profiles'
             Description         = 'ProfileFolder'
             ConcurrentUserLimit = 40
+            FolderEnumerationMode = 'AccessBased'
+            FullAccess = @('Everyone')
             DependsOn           = '[File]home'
         }
-
+        #region profile permissions
+        $Path = 'z:\users\profiles'
+        cNtfsPermissionsInheritance 'DisableInheritanceProfile' {
+            Path              = $Path
+            Enabled           = $false
+            PreserveInherited = $true
+            DependsOn         = '[File]Home'
+        }
+        cNtfsPermissionEntry PermissionSetProfile1 {
+            Ensure                   = 'Present'
+            Path                     = $Path
+            Principal                = "BUILTIN\Users"
+            AccessControlInformation = @(
+                cNtfsAccessControlInformation {
+                    AccessControlType  = 'Allow'
+                    FileSystemRights   = 'ListDirectory', 'ReadData', 'AppendData', 'CreateFiles'
+                    Inheritance        = 'ThisFolderOnly'
+                    NoPropagateInherit = $false
+                }
+            )
+        }
+        #endregion profilepermissions
         VSS disk_X {
             Drive     = 'X:'
             Size      = 1Gb
@@ -643,7 +1040,7 @@
 
     }
 
-   #region DHCP
+    #region DHCP
     node $AllNodes.Where( { $_.Role -eq 'DHCP' }).NodeName {       
             
 

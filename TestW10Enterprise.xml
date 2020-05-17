@@ -55,7 +55,7 @@
                             <PlainText>false</PlainText>
                         </Password>
                         <Description>Local</Description>
-                        <DisplayName>Coen</DisplayName>
+                        <DisplayName>AdminCoen</DisplayName>
                         <Name>coen</Name>
                         <Group>Administrators</Group>
                     </LocalAccount>
