@@ -967,6 +967,7 @@
             Path         = 'x:\data\eerste'
             Description  = 'Eerste datashare'
             ChangeAccess = @('Users')
+            FullAccess = @("$($dcdata.NetbiosName)\Automatisering")
             DependsOn    = '[File]eerste'
         }
         SmbShare 'Data2' {
@@ -975,12 +976,17 @@
             Description         = 'Tweede datashare'
             ConcurrentUserLimit = 20
             DependsOn           = '[File]tweede'
+            ChangeAccess = @('Users')
+            ReadAccess = @()
+            FullAccess = @("$($dcdata.NetbiosName)\Automatisering")
         }
         SmbShare 'HomeFolders' {
             Name                = 'UserFolders'
             Path                = 'z:\users\home'
             Description         = 'HomeFolders'
             ConcurrentUserLimit = 30
+            FolderEnumerationMode = 'AccessBased'
+            FullAccess = @('Everyone')
             DependsOn           = '[File]home'
         }
         SmbShare 'ProfileFolder' {
