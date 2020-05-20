@@ -392,7 +392,7 @@
         }
         #region Homefolders
         if (($node.nodename) -eq 'POSHDC1') {
-            $users = get-content "C:\Users\chodz\Documents\github\DSCLabCoen\AD-users.json" | ConvertFrom-Json
+            $users = get-content "$((get-item env:userprofile).value)\Documents\github\DSCLabCoen\AD-users.json" | ConvertFrom-Json
             $parentpath = "z:\users\home"
 
             foreach ($user in $users) {
