@@ -18,14 +18,14 @@
         @{
             # Node Specific Data
             NodeName   = 'POSHDC1'
-            Role       = @('FirstDC', 'DHCP', 'ExtraHdd', 'DFS')
+            Role       = @('FirstDC', 'DHCP', 'ExtraHdd')
             IpAddress  = '192.168.5.1'
             MacAddress = '001523be0c01'
             Features   = @('AD-Domain-Services', 'DHCP', 'FS-Resource-Manager', 'FS-DFS-Replication', 'FS-DFS-NameSpace')
         },
         @{
             NodeName   = 'POSHDC2'
-            Role       = @('SecondDC', 'ExtraHdd', 'DFS')
+            Role       = @('SecondDC', 'ExtraHdd')
             IpAddress  = '192.168.5.2'
             MacAddress = '001523be0c02'
             Features   = @('AD-Domain-Services', 'FS-Resource-Manager', 'FS-DFS-Replication', 'FS-DFS-NameSpace')
