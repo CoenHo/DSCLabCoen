@@ -1100,26 +1100,74 @@
     #endregion
     #region DFS
     node $AllNodes.Where( { $_.Role -eq 'DFS' }).NodeName {
+        File DFS
+        {
+            destinationPath = 'X:\data\eerste\public'
+            Type = 'Directory'            
+        }
+        SmbShare DFSSHare
+        {
+            Name = 'Public'
+            Path = 'X:\data\eerste\public'
+            FullAccess = 'Everyone'
+            DependsOn = '[File]Dfs'
+        }
         # Configure the namespace
         DFSNamespaceRoot DFSNamespaceRoot_Domain_Software_POSHDC1
         {
-            Path                 = "\\$($DCData.DomainName)\Data"
-            TargetPath           = '\\poshdc1\Data1'
+            Path                 = "\\$($DCData.DomainName)\Public"
+            TargetPath           = '\\poshdc1\Public'
             Ensure               = 'Present'
             Type                 = 'DomainV2'
             Description          = 'AD Domain based DFS namespace for storing software installers'
             PsDscRunAsCredential = $DomainCredential
         } # End of DFSNamespaceRoot Resource
 
-        DFSNamespaceRoot DFSNamespaceRoot_Domain_Software_POSHDC2
+        
+       
+        # Configure the Replication Group
+        DFSReplicationGroup RGPublic
         {
-            Path                 = "\\$($DCData.DomainName)\Data"
-            TargetPath           = '\\poshdc2\Data1'
-            Ensure               = 'Present'
-            Type                 = 'DomainV2'
-            Description          = 'AD Domain based DFS namespace for storing software installers'
-            PsDscRunAsCredential = $DomainCredential
-        } # End of DFSNamespaceRoot Resource
+            GroupName = 'Public'
+            Description = 'Public files for use by all departments'
+            Ensure = 'Present'
+            Members = 'POSHDC1','POSHDC2'
+            Folders = 'Software'
+            Topology = 'Fullmesh'
+            PSDSCRunAsCredential = $DomainCredential
+            
+        } # End of RGPublic Resource
+
+        DFSReplicationGroupFolder RGSoftwareFolder
+        {
+            GroupName = 'Public'
+            FolderName = 'Software'
+            Description = 'DFS Share for storing software installers'
+            DirectoryNameToExclude = 'Temp'
+            PSDSCRunAsCredential = $DomainCredential
+            DependsOn = '[DFSReplicationGroup]RGPublic'
+        } # End of RGPublic Resource
+
+        DFSReplicationGroupMembership RGPublicSoftwareFS1
+        {
+            GroupName = 'Public'
+            FolderName = 'Software'
+            ComputerName = 'POSHDC1'
+            ContentPath = 'x:\Data\Eerste\Software'
+            PrimaryMember = $true
+            PSDSCRunAsCredential = $DomainCredential
+            DependsOn = '[DFSReplicationGroupFolder]RGSoftwareFolder'
+        } # End of RGPublicSoftwareFS1 Resource
+
+        DFSReplicationGroupMembership RGPublicSoftwareFS2
+        {
+            GroupName = 'Public'
+            FolderName = 'Software'
+            ComputerName = 'FileServer2'
+            ContentPath = 'x:\Data\Eerste\Software'
+            PSDSCRunAsCredential = $DomainCredential
+            DependsOn = '[DFSReplicationGroupFolder]RGSoftwareFolder'
+        } # End of RGPublicSoftwareFS2 Resource
     }
     #endregion DFS
 }#end configuration
