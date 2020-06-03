@@ -279,11 +279,10 @@
             }
         }# End foreach
 
-        Script 'Routing'
-        {
-            SetScript = {powershell.exe c:\ConfigFiles\Routing.ps1}
-            TestScript = {$false}
-            GetScript = { <# Do Nothing #> }
+        Script 'Routing' {
+            SetScript  = { powershell.exe c:\ConfigFiles\Routing.ps1 }
+            TestScript = { $false }
+            GetScript  = { <# Do Nothing #> }
             DependsOn  = '[Windowsfeature]Routing'
         }
     }# End region FS
@@ -295,35 +294,35 @@
             ExecutionPolicyScope = 'Localmachine'
             ExecutionPolicy      = 'Remotesigned'
         }
-       # Adds RSAT which is now a Windows Capability in Windows 10    
-            Script RSAT {
-                TestScript = {
-                    $packages = Get-WindowsCapability -online -Name Rsat*
-                    if ($packages.state -match "Installed") {
-                        Return $True
-                    }
-                    else {
-                        Return $False
-                    }
+        # Adds RSAT which is now a Windows Capability in Windows 10    
+        Script RSAT {
+            TestScript = {
+                $packages = Get-WindowsCapability -online -Name Rsat*
+                if ($packages.state -match "Installed") {
+                    Return $True
                 }
-    
-                GetScript  = {
-                    $packages = Get-WindowsCapability -online -Name Rsat* | Select-Object Displayname, State
-                    $installed = $packages.Where( { $_.state -eq "Installed" })
-                    Return @{Result = "$($installed.count)/$($packages.count) RSAT features installed" }
-                }
-    
-                SetScript  = {
-                    Get-WindowsCapability -online -Name Rsat* | Where-Object { $_.state -ne "installed" } | Add-WindowsCapability -online
+                else {
+                    Return $False
                 }
             }
     
-            #since RSAT is added to the client go ahead and create a Scripts folder
-            File scripts {
-                DestinationPath = 'C:\Scripts'
-                Ensure          = 'present'
-                type            = 'directory'
+            GetScript  = {
+                $packages = Get-WindowsCapability -online -Name Rsat* | Select-Object Displayname, State
+                $installed = $packages.Where( { $_.state -eq "Installed" })
+                Return @{Result = "$($installed.count)/$($packages.count) RSAT features installed" }
             }
+    
+            SetScript  = {
+                Get-WindowsCapability -online -Name Rsat* | Where-Object { $_.state -ne "installed" } | Add-WindowsCapability -online
+            }
+        }
+    
+        #since RSAT is added to the client go ahead and create a Scripts folder
+        File scripts {
+            DestinationPath = 'C:\Scripts'
+            Ensure          = 'present'
+            type            = 'directory'
+        }
     }# End region Client
 
     #region DomainJoin config
@@ -411,18 +410,18 @@
             Ensure          = "Present"
             DependsOn       = '[Disk]XVolume'
         }
+        
         FileSystemAccessRule 'AddRightChange' {
             Path     = 'x:\data\eerste\Administratie'
             Identity = "$($dcdata.NetbiosName)\Staf"
             Rights   = @('ChangePermissions')
         }
-
-        file 'Automatisering' {
-            Type            = 'Directory'
-            DestinationPath = 'x:\data\eerste\Automatisering'
-            Ensure          = "Present"
-            DependsOn       = '[Disk]XVolume'
+        FileSystemAccessRule 'AddRightRead' {
+            Path     = 'x:\data\eerste\Administratie'
+            Identity = "$($dcdata.NetbiosName)\Administratie"
+            Rights   = @('ChangePermissions')
         }
+       
         file 'Software' {
             Type            = 'Directory'
             DestinationPath = 'x:\data\eerste\Software'
@@ -511,7 +510,7 @@
 
     }
 
-   #region DHCP
+    #region DHCP
     node $AllNodes.Where( { $_.Role -eq 'DHCP' }).NodeName {       
             
 
