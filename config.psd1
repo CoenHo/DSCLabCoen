@@ -32,22 +32,22 @@
         },        
         @{
             NodeName   = 'POSHMS1'
-            Role       = @('MS')
+            Role       = @('MS', 'domainJoin')
             MacAddress = '001523be0d01'
         },
         @{
             NodeName   = 'POSHMS2'
-            Role       = @('MS')
+            Role       = @('MS', 'domainJoin')
             MacAddress = '001523be0d02'
         },
         @{
             NodeName   = 'POSHMS3'
-            Role       = @('MS')
+            Role       = @('MS', 'domainJoin')
             MacAddress = '001523be0d03'
         },
         @{
             NodeName   = 'POSHMS4'
-            Role       = @('MS')
+            Role       = @('MS', 'domainJoin')
             MacAddress = '001523be0d04'
         },
         @{
