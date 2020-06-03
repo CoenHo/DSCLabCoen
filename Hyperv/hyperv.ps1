@@ -98,7 +98,7 @@ configuration xVMHyperV_Complete
                 }
             }
             #if name like POSHDC an extra hardrive will be added
-            if ($_ -like 'POSHDC*') {
+            if (($_ -like 'POSHDC*') -or ($_ -Like 'POSHMS*')) {
                 xvhd "$_-Data" {
                     Ensure           = 'Present'
                     Name             = "$_-DataDisk.vhdx"
@@ -165,7 +165,7 @@ $ConfigData = @{
     AllNodes    = @(
         @{
             NodeName = "localhost"
-            VmName   = "POSHDC1", "POSHDC2", "POSHFS", "POSHCL1"
+            VmName   = "POSHDC1", "POSHDC2", "POSHFS", "POSHCL1", "POSHMS1", "POSHMS2", "POSHMS3", "POSHMS4"
             Role     = "VM"
         })
     Nodes       = @(@{
