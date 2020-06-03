@@ -1,56 +1,93 @@
 [
     {
-        "DistinguishedName":  "CN=IT,OU=IT,DC=Company,DC=Pri",
-        "Name":  "IT",
-        "GroupCategory":  "Security",
-        "GroupScope":  "Global",
-        "Members":  [
-                        "MikeS",
-                        "MaryL"
-                    ]
+        "DistinguishedName": "OU=Directie,OU=CHAfdelingen,DC=AC8-CoeHod,DC=int",
+        "Name": "Directie",
+        "GroupCategory": "Security",
+        "GroupScope": "Global",
+        "Manager": "jdewit",
+        "Members": [
+            "jdewit",
+            "hslager",
+            "ismulder",
+            "swolf",
+            "nsmeets"
+        ]
     },
     {
-        "DistinguishedName":  "CN=Sales,OU=Sales,DC=Company,DC=Pri",
-        "Name":  "Sales",
-        "GroupCategory":  "Security",
-        "GroupScope":  "Global",
-        "Members":  [
-                        "SamanthaS",
-                        "SonyaS",
-                        "SamS"
-                    ]
+        "DistinguishedName": "OU=Verkoop,OU=Marketing,OU=CHAfdelingen,DC=AC8-CoeHod,DC=int",
+        "Name": "Verkoop",
+        "GroupCategory": "Security",
+        "GroupScope": "Global",
+        "Manager": "hslager",
+        "Members": [
+            "hslager",
+            "pschalk",
+            "hdevries"
+        ]
     },
     {
-        "DistinguishedName":  "CN=Marketing,OU=Marketing,DC=Company,DC=Pri",
-        "Name":  "Marketing",
-        "GroupCategory":  "Security",
-        "GroupScope":  "Global",
-        "Members":  [
-                        "MattS",
-                        "MonicaS",
-                        "MarkS"
-                    ]
+        "DistinguishedName": "OU=Automatisering,OU=CHAfdelingen,DC=AC8-CoeHod,DC=int",
+        "Name": "Automatisering",
+        "GroupCategory": "Security",
+        "GroupScope": "Global",
+        "Manager": "ismulder",
+        "Members": [
+            "ismulder",
+            "rsmit",
+            "chodzelmans"
+        ]
     },
     {
-        "DistinguishedName":  "CN=Accounting,OU=Accounting,DC=Company,DC=Pri",
-        "Name":  "Accounting",
-        "GroupCategory":  "Security",
-        "GroupScope":  "Global",
-        "Members":  [
-                        "AaronS",
-                        "AndreaS",
-                        "AndyS"
-                    ]
+        "DistinguishedName": "OU=Productie,OU=CHAfdelingen,DC=AC8-CoeHod,DC=int",
+        "Name": "Productie",
+        "GroupCategory": "Security",
+        "GroupScope": "Global",
+        "Manager": "swolf",
+        "Members": [
+            "swolf",
+            "pboeren",
+            "wbrand",
+            "rzijlaart",
+            "npeters",
+            "fbeenhakker",
+            "rvisser"
+        ]
     },
     {
-        "DistinguishedName":  "CN=JEA Operators,OU=JEA_Operators,DC=Company,DC=Pri",
-        "Name":  "JEA Operators",
-        "GroupCategory":  "Security",
-        "GroupScope":  "Global",
-        "Members":  [
-                        "JimJ",
-                        "JillJ"
-                    ]
+        "DistinguishedName": "OU=Administratie,OU=CHAfdelingen,DC=AC8-CoeHod,DC=int",
+        "Name": "Administratie",
+        "GroupCategory": "Security",
+        "GroupScope": "Global",
+        "Manager": "nsmeets",
+        "Members": [
+            "nsmeets",
+            "wpellen"
+        ]
+    },
+    {
+        "DistinguishedName": "OU=Productie,OU=CHAfdelingen,DC=AC8-CoeHod,DC=int",
+        "Name": "Fabricage",
+        "GroupCategory": "Security",
+        "GroupScope": "Global",
+        "Manager": "wbrand",
+        "Members": [
+            "swolf",
+            "wbrand",
+            "npeters",
+            "fbeenhakker",
+            "rvisser"
+        ]
+    },
+    {
+        "DistinguishedName": "OU=Staf,OU=CHAfdelingen,DC=AC8-CoeHod,DC=int",
+        "Name": "Staf",
+        "GroupCategory": "Security",
+        "GroupScope": "Global",
+        "Manager": "jdewit",
+        "Members": [
+            "jdewit",
+            "ddevos",
+            "pdijk"
+        ]
     }
-
 ]

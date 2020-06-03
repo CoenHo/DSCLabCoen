@@ -98,7 +98,7 @@ configuration xVMHyperV_Complete
                 }
             }
             #if name like POSHDC an extra hardrive will be added
-            if ($_ -like 'POSHDC*') {
+            if (($_ -like 'POSHDC*') -or ($_ -Like 'POSHMS*')) {
                 xvhd "$_-Data" {
                     Ensure           = 'Present'
                     Name             = "$_-DataDisk.vhdx"
@@ -165,7 +165,7 @@ $ConfigData = @{
     AllNodes    = @(
         @{
             NodeName = "localhost"
-            VmName   = "POSHDC1", "POSHDC2", "POSHFS", "POSHCL1"
+            VmName   = "POSHDC1", "POSHDC2", "POSHFS", "POSHCL1", "POSHMS1", "POSHMS2", "POSHMS3", "POSHMS4"
             Role     = "VM"
         })
     Nodes       = @(@{
@@ -207,7 +207,7 @@ $ConfigData = @{
 
 switch ((get-item env:computername).value) {
     'LAPTOPCOEN' { xVMHyperV_Complete -ServerBasePath "$((get-vmhost).VirtualMachinePath)\Base\WS2019_SE_UEFI.vhdx" -ClientBasePath "$((get-vmhost).VirtualMachinePath)\Base\W10_E_UEFI.vhdx"  -ConfigurationData $ConfigData -OutputPath "$((get-item env:userprofile).value)\Documents\GitHub\DSCLabCoen\dsc\hyperv" -VmPath "$((get-vmhost).VirtualMachinePath)" }
-    'SURFACE' { xVMHyperV_Complete -ServerBasePath "$((get-vmhost).VirtualMachinePath)\Base\WS2019_SE_UEFI.vhdx" -ClientBasePath "$((get-vmhost).VirtualMachinePath)\Base\W10_E_UEFI.vhdx"  -ConfigurationData $ConfigData -OutputPath "$((get-item env:userprofile).value)\Documenten\GitHub\DSCLabCoen\dsc\hyperv" -VmPath "$((get-vmhost).VirtualMachinePath)" }
+    'SURFACE' { xVMHyperV_Complete -ServerBasePath "$((get-vmhost).VirtualMachinePath)\Base\WS2019_SE_UEFI.vhdx" -ClientBasePath "$((get-vmhost).VirtualMachinePath)\Base\W10_E_UEFI.vhdx"  -ConfigurationData $ConfigData -OutputPath "$((get-item env:userprofile).value)\Documents\GitHub\DSCLabCoen\dsc\hyperv" -VmPath "$((get-vmhost).VirtualMachinePath)" }
     'COENPC' { xVMHyperV_Complete -serverbasePath "$((get-vmhost).VirtualMachinePath)\Base\WS19_SE._UEFI.vhdx" -clientbasepath "$((get-vmhost).VirtualMachinePath)\Base\W10_E_UEFI.vhdx" -ConfigurationData $ConfigData -OutputPath "$((get-item env:userprofile).value)\Documents\GitHub\DSCLabCoen\dsc\hyperv" -VmPath "$((get-vmhost).VirtualMachinePath)" }
     Default { write-host "PCName is unknown" }
 }
