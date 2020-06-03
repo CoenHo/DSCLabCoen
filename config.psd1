@@ -29,14 +29,22 @@
             IpAddress  = '192.168.5.2'
             MacAddress = '001523be0c02'
             Features   = @('AD-Domain-Services', 'FS-Resource-Manager', 'FS-DFS-Replication', 'FS-DFS-NameSpace')
+        },        
+        @{
+            NodeName     = 'POSHMS1'
+            Role         = @('MS')
         },
         @{
-            NodeName     = 'POSHFS'
-            Role         = @('FS', 'ROUTING', 'domainJoin')
-            IpAddress    = '192.168.5.254'
-            MacAddress   = '001523be0c03'
-            MacAddressEx = '001523be0c04'
-            Features     = @('ROUTING', 'RSAT-RemoteAccess')
+            NodeName     = 'POSHMS2'
+            Role         = @('MS')
+        },
+        @{
+            NodeName     = 'POSHMS3'
+            Role         = @('MS')
+        },
+        @{
+            NodeName     = 'POSHMS4'
+            Role         = @('MS')
         },
         @{
             NodeName   = 'POSHCL1'
