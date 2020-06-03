@@ -31,20 +31,24 @@
             Features   = @('AD-Domain-Services', 'FS-Resource-Manager', 'FS-DFS-Replication', 'FS-DFS-NameSpace')
         },        
         @{
-            NodeName     = 'POSHMS1'
-            Role         = @('MS')
+            NodeName   = 'POSHMS1'
+            Role       = @('MS')
+            MacAddress = '001523be0d01'
         },
         @{
-            NodeName     = 'POSHMS2'
-            Role         = @('MS')
+            NodeName   = 'POSHMS2'
+            Role       = @('MS')
+            MacAddress = '001523be0d02'
         },
         @{
-            NodeName     = 'POSHMS3'
-            Role         = @('MS')
+            NodeName   = 'POSHMS3'
+            Role       = @('MS')
+            MacAddress = '001523be0d03'
         },
         @{
-            NodeName     = 'POSHMS4'
-            Role         = @('MS')
+            NodeName   = 'POSHMS4'
+            Role       = @('MS')
+            MacAddress = '001523be0d04'
         },
         @{
             NodeName   = 'POSHCL1'

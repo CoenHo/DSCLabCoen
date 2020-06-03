@@ -322,10 +322,11 @@
             Ensure          = 'present'
             type            = 'directory'
         }
-    }# End region Client
+    }#End region Client
 
     #region DomainJoin config
-    node $AllNodes.Where( { $_.Role -eq 'domainJoin' }).NodeName {
+    node $AllNodes.Where( { $_.Role -eq 'domainJoin' }).NodeName 
+    {
 
         
 
@@ -344,7 +345,8 @@
         }
     }#end DomainJoin Config
     
-    node $AllNodes.Where( { $_.Role -eq 'ExtraHdd' }).NodeName {
+    node $AllNodes.Where( { $_.Role -eq 'ExtraHdd' }).NodeName 
+    {
         WaitForDisk Disk1 {
             DiskId           = 1
             RetryIntervalSec = 60
@@ -1097,9 +1099,14 @@
         }
 
     } #end DHCP Config
-    #endregion
+    
+    node $AllNodes.Where{ $_.Role -eq 'MS' }.NodeName
+    {
+
+    }
     #region DFS
-    node $AllNodes.Where( { $_.Role -eq 'DFS' }).NodeName {
+    node $AllNodes.Where( { $_.Role -eq 'DFS' }).NodeName 
+    {
         File DFS
         {
             destinationPath = 'X:\data\eerste\public'
@@ -1168,8 +1175,7 @@
             PSDSCRunAsCredential = $DomainCredential
             DependsOn = '[DFSReplicationGroupFolder]RGSoftwareFolder'
         } # End of RGPublicSoftwareFS2 Resource
-    }
-    #endregion DFS
+    }#endregion DFS
 }#end configuration
 
 
