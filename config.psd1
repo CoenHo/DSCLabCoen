@@ -55,6 +55,12 @@
             Role       = @('CLIENT', 'domainJoin')
             MacAddress = '001523be0c05'
         }
+        ,
+        @{
+            NodeName   = 'POSHCL2'
+            Role       = @('CLIENT')
+            MacAddress = '001523be0c06'
+        }
     )
     Credential = @{
         LabPassword = 'P@ssw0rd'
