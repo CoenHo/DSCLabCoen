@@ -165,7 +165,7 @@ $ConfigData = @{
     AllNodes    = @(
         @{
             NodeName = "localhost"
-            VmName   = "POSHDC1", "POSHDC2", "POSHFS", "POSHCL1", "POSHMS1", "POSHMS2", "POSHMS3", "POSHMS4"
+            VmName   = "POSHDC1", "POSHDC2", "POSHFS", "POSHCL1", "POSHCL2", "POSHMS1", "POSHMS2", "POSHMS3", "POSHMS4"
             Role     = "VM"
         })
     Nodes       = @(@{
