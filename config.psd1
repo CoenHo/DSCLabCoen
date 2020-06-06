@@ -53,7 +53,7 @@
         },
         @{
             NodeName   = 'POSHCL1'
-            Role       = @('CLIENT', 'domainJoin')
+            Role       = @('CLIENT', 'domainJoin','Software')
             MacAddress = '001523be0c05'
         }
         ,

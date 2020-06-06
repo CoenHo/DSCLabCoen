@@ -1,6 +1,6 @@
 ﻿Configuration TestDSC
 {
-    Import-DscResource -ModuleName PSDesiredStateConfiguration, ComputerManagementDsc, ActiveDirectoryDSC, NetworkingDsc, xDHCPServer, StorageDSC, Mario_cVSS, FileSystemDsc, cNtfsAccessControl, DFSDsc
+    Import-DscResource -ModuleName PSDesiredStateConfiguration, ComputerManagementDsc, ActiveDirectoryDSC, NetworkingDsc, xDHCPServer, StorageDSC, Mario_cVSS, FileSystemDsc, cNtfsAccessControl, DFSDsc, cChoco
 
     $Secure = ConvertTo-SecureString -String "$($ConfigurationData.Credential.LabPassword)" -AsPlainText -Force
     $credential = New-Object -typename Pscredential -ArgumentList Administrator, $secure
@@ -1064,6 +1064,50 @@
 
     }
 
+    #region Software
+    node $AllNodes.Where( { $_.Role -eq 'Software'})
+    {
+        cChocoInstaller installChoco
+  {
+    InstallDir = "c:\ProgramData\chocolatey"
+  }
+  cChocoPackageInstaller installvscode
+  {
+     Name = "vscode"
+     DependsOn = "[cChocoInstaller]installChoco"
+  }
+  cChocoPackageInstaller install7zip
+  {
+     Name = "7zip"
+     DependsOn = "[cChocoInstaller]installChoco"
+  }
+  cChocoPackageInstaller installpwsh
+  {
+     Name = "pwsh"
+     DependsOn = "[cChocoInstaller]installChoco"
+  }
+  cChocoPackageInstaller installwt
+  {
+     Name = "microsoft-windows-terminal"
+     DependsOn = "[cChocoInstaller]installChoco"
+  }
+  cChocoPackageInstaller installcascadia
+  {
+     Name = "cascadiacode"
+     DependsOn = "[cChocoInstaller]installChoco"
+  }
+  cChocoPackageInstaller installcascadiapl
+  {
+     Name = "cascadiacodepl"
+     DependsOn = "[cChocoInstaller]installChoco"
+  }
+  cChocoPackageInstaller installcascadiamono
+  {
+     Name = "cascadiacodemono"
+     DependsOn = "[cChocoInstaller]installChoco"
+  }
+    }
+    #end region Software
     #region DHCP
     node $AllNodes.Where( { $_.Role -eq 'DHCP' }).NodeName {       
             
@@ -1104,6 +1148,7 @@
     {
 
     }
+
     #region DFS
     node $AllNodes.Where( { $_.Role -eq 'DFS' }).NodeName 
     {
