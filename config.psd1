@@ -78,7 +78,7 @@
  
     DHCPData   = @{
         DHCPFeatures           = @('DHCP')
-        DHCPName               = 'DHCP1'
+        DHCPName               = 'LAN'
         DHCPIPStartRange       = '192.168.5.100'
         DHCPIPEndRange         = '192.168.5.250'
         DHCPSubnetMask         = '255.255.255.0'
