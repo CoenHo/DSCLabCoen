@@ -188,6 +188,31 @@ $ConfigData = @{
             Name       = 'POSHCL1'
             MacAddress = '001523be0c05'
               
+        },
+        @{
+            Name       = 'POSHCL2'
+            MacAddress = '001523be0c06'
+              
+        },
+        @{
+            Name       = 'POSHMS1'
+            MacAddress = '001523be0d01'
+              
+        },
+        @{
+            Name       = 'POSHMS2'
+            MacAddress = '001523be0d02'
+              
+        },
+        @{
+            Name       = 'POSHMS3'
+            MacAddress = '001523be0d03'
+              
+        },
+        @{
+            Name       = 'POSHMS4'
+            MacAddress = '001523be0d04'
+              
         })
         
     
