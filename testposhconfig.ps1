@@ -327,17 +327,16 @@
     #region DomainJoin config
     node $AllNodes.Where( { $_.Role -eq 'domainJoin' }).NodeName 
     {
-
-        
-
-        WaitForADDomain DscForestWait {
+        WaitForADDomain DscForestWait 
+        {
             DomainName   = $DCData.DomainName
             Credential   = $DomainCredential
             RestartCount = '20'
             WaitTimeout  = '600'
         }
 
-        Computer JoinDC {
+        Computer JoinDC 
+        {
             Name       = $Node.NodeName
             DomainName = $DCData.DomainName
             Credential = $DomainCredential
