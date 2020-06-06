@@ -1065,7 +1065,7 @@
     }
 
     #region Software
-    node $AllNodes.Where( { $_.Role -eq 'Software'})
+    node $AllNodes.Where( { $_.Role -eq 'Software'}).Nodename
     {
         cChocoInstaller installChoco
   {
