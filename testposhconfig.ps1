@@ -1105,6 +1105,11 @@
      Name = "cascadiacodemono"
      DependsOn = "[cChocoInstaller]installChoco"
   }
+  cChocoPackageInstaller installmicrosoft-edge
+  {
+     Name = "microsoft-edge"
+     DependsOn = "[cChocoInstaller]installChoco"
+  }
     }
     #end region Software
     #region DHCP
