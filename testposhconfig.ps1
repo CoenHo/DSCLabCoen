@@ -41,7 +41,20 @@
                 Ensure = 'Present'
                 UserAuthentication = 'Secure'
             }
-        }
+            #region Firewall Rules        
+            $FireWallRules = $ConfigurationData.FirewallRules.FirewallRuleNames
+
+            foreach ($Rule in $FireWallRules)
+            {
+                Firewall $Rule
+                {
+                    Name    = $Rule
+                    Enabled = 'True'
+                    Profile = ('Domain', 'Private')
+                }
+            } #End foreach
+            #endregion
+        }#end if not client
         if ($node.Nodename -eq 'POSHFS') {
             NetAdapterName RenameWanAdapter {
                 NewName    = 'WAN'
@@ -73,20 +86,7 @@
             }
         }
 
-        #region Firewall Rules
-
         
-        $FireWallRules = $ConfigurationData.FirewallRules.FirewallRuleNames
-
-        foreach ($Rule in $FireWallRules) {
-            Firewall $Rule {
-                Name    = $Rule
-                Enabled = 'True'
-                Profile = ('Domain', 'Private')
-            }
-        } #End foreach
-
-        #endregion
         
 
     }#end allnodes
