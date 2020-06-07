@@ -14,7 +14,7 @@
             AddressFamily               = 'IPv4'
             IPNetwork                   = '192.168.5.0/24'
             DnsServerAddress            = @('192.168.5.1', '192.168.5.2')
-            FirewallRules               = @('FPS-ICMP4-ERQ-In')
+            FirewallRules               = @('FPS-ICMP4-ERQ-In','RemoteDesktop-UserMode-In-TCP','RemoteDesktop-UserMode-In-UDP','RemoteDesktop-Shadow-In-TCP')
         },
         @{
             # Node Specific Data
