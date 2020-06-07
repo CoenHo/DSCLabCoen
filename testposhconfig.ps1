@@ -73,12 +73,13 @@
         #region Firewall Rules
 
         
-        $FireWallRules = $ConfigurationData.Firewall.FirewallRuleNames
+        $FireWallRules = $ConfigurationData.FirewallRules.FirewallRuleNames
 
         foreach ($Rule in $FireWallRules) {
             Firewall $Rule {
                 Name    = $Rule
                 Enabled = 'True'
+                Profile = ('Domain', 'Private')
             }
         } #End foreach
 

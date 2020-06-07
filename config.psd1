@@ -14,7 +14,7 @@
             AddressFamily               = 'IPv4'
             IPNetwork                   = '192.168.5.0/24'
             DnsServerAddress            = @('192.168.5.1', '192.168.5.2')
-            FirewallRules               = @('FPS-ICMP4-ERQ-In','RemoteDesktop-UserMode-In-TCP','RemoteDesktop-UserMode-In-UDP','RemoteDesktop-Shadow-In-TCP')
+            
         },
         @{
             # Node Specific Data
@@ -97,6 +97,9 @@
         DHCPDnsServerIPAddress = @('192.168.5.1', '192.168.5.2')
         DHCPRouter             = '192.168.5.254'
         DHCPReservationIp      = '192.168.5.150'
+    }
+    FirewallRules = @{
+        FirewallRuleNames   = @('FPS-ICMP4-ERQ-In','RemoteDesktop-UserMode-In-TCP','RemoteDesktop-UserMode-In-UDP','RemoteDesktop-Shadow-In-TCP')
     }
 }
 # Save ConfigurationData in a file with .psd1 file extension
