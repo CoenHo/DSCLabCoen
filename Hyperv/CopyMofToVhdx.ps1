@@ -1,6 +1,6 @@
 Start-DscConfiguration -Wait -Force -Path "$((get-item env:userprofile).value)\Documents\GitHub\DSCLabCoen\dsc\hyperv"
 
-$modules = @('ActiveDirectoryDsc', 'ComputerManagementDsc', 'NetworkingDsc', 'xDhcpServer', 'StorageDSC', 'Mario_cVSS', 'DFSDsc', 'FileSystemDsc', 'cNtfsAccessControl','cChoco')
+$modules = @('ActiveDirectoryDsc', 'ComputerManagementDsc', 'NetworkingDsc', 'xDhcpServer', 'StorageDSC', 'Mario_cVSS', 'DFSDsc', 'FileSystemDsc', 'cNtfsAccessControl','cChoco','xRemoteDesktopAdmin')
 
 foreach ($module in $modules) {
     if (-not(test-path "C:\Program Files\WindowsPowerShell\Modules\$module")) {

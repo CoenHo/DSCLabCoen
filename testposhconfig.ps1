@@ -1,6 +1,6 @@
 ﻿Configuration TestDSC
 {
-    Import-DscResource -ModuleName PSDesiredStateConfiguration, ComputerManagementDsc, ActiveDirectoryDSC, NetworkingDsc, xDHCPServer, StorageDSC, Mario_cVSS, FileSystemDsc, cNtfsAccessControl, DFSDsc, cChoco
+    Import-DscResource -ModuleName PSDesiredStateConfiguration, ComputerManagementDsc, ActiveDirectoryDSC, NetworkingDsc, xDHCPServer, StorageDSC, Mario_cVSS, FileSystemDsc, cNtfsAccessControl, DFSDsc, cChoco, xRemoteDesktopAdmin
 
     $Secure = ConvertTo-SecureString -String "$($ConfigurationData.Credential.LabPassword)" -AsPlainText -Force
     $credential = New-Object -typename Pscredential -ArgumentList Administrator, $secure
@@ -34,7 +34,11 @@
             NewName    = 'LAB'
             MacAddress = "$($node.MacAddress)".insert(2, "-").insert(5, "-").insert(8, "-").insert(11, "-").insert(14, "-")
         }
-        
+        xRemoteDesktopAdmin RemoteDesktopSettings
+        {
+           Ensure = 'Present'
+           UserAuthentication = 'Secure'
+        }
         if ($node.Nodename -eq 'POSHFS') {
             NetAdapterName RenameWanAdapter {
                 NewName    = 'WAN'
