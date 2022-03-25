@@ -1,3 +1,5 @@
 https://theitbros.com/sysprep-windows-10-machine-guide/
 
 https://web.sas.upenn.edu/jasonrw/2018/03/21/building-an-image-of-windows-10-for-mass-distribution/
+
+https://www.dtonias.com/add-computers-trustedhosts-list-powershell/
