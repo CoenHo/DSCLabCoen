@@ -62,14 +62,17 @@ configuration xVMHyperV_Complete
                 Ensure = 'Present'
                 Name   = 'Hyper-V-PowerShell'
             }
+            xVMSwitch "Extern" {
+                Name = 'Extern'
+                Type = 'External'
+                AllowManagementOS = $true
+                NetAdapterName = (Get-NetAdapter -physical | Where-Object status -eq 'up').name
+                Ensure = 'Present'
+                DependsOn = $HyperVDependency
+            }
         }
 
-        xVMSwitch "Extern" {
-            Name = 'Extern'
-            Type = 'External'
-            AllowManagementOS = $true
-            Ensure = 'Present'
-        }
+        
 
         $ConfigData.AllNodes.Where{ $_.Role -eq "VM" }.VmName | ForEach-Object {
             #Make sure that path for vhdx exists
