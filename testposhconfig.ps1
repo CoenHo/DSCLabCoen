@@ -1127,6 +1127,7 @@
         xDhcpServerAuthorization 'DhcpServerAuthorization' {
             Ensure    = 'Present';
             DependsOn = '[WindowsFeature]DHCP'
+            IsSingleInstance = 'True'
         }
 
         xDhcpServerScope 'DhcpScope' {
