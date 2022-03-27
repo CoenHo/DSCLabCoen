@@ -66,7 +66,7 @@ configuration xVMHyperV_Complete
                 Name = 'Extern'
                 Type = 'External'
                 AllowManagementOS = $true
-                NetAdapterName = (Get-NetAdapter -physical | Where-Object status -eq 'up').name
+                NetAdapterName = Get-NetAdapter -physical -Name 'NIC1'
                 Ensure = 'Present'
                 DependsOn = $HyperVDependency
             }
@@ -180,23 +180,23 @@ $ConfigData = @{
         })
     Nodes       = @(@{
             Name       = 'D1-COEHODE2X'
-            MacAddress = '001523be0c01'
+            MacAddress = '00155D02B2FF'
                 
         },
         @{
             Name       = 'DC2-COEHODE2X'
-            MacAddress = '001523be0c02'
+            MacAddress = '00155D02B2FE'
                 
         },
         @{
             Name         = 'RTR-COEHODE2X'
-            MacAddress   = '001523be0c03'
-            MacAddressEx = '001523be0c04'
+            MacAddress   = '00155D02B2FD'
+            MacAddressEx = '00155D02B2FC'
               
         },
         @{
             Name       = 'CLT-COEHODE2X'
-            MacAddress = '001523be0c05'
+            MacAddress = '00155D02B2FB'
               
         })
         
@@ -215,5 +215,5 @@ $ConfigData = @{
 }
 
 
-xVMHyperV_Complete -ServerBasePath "$((get-vmhost).VirtualMachinePath)\Base\WS2019_SE_UEFI.vhdx" -ClientBasePath "$((get-vmhost).VirtualMachinePath)\Base\W10_E_UEFI.vhdx"  -ConfigurationData $ConfigData -OutputPath "$((get-item env:userprofile).value)\Documents\GitHub\DSCLabCoen\dsc\hyperv" -VmPath "$((get-vmhost).VirtualMachinePath)"
+xVMHyperV_Complete -ServerBasePath "$((get-vmhost).VirtualMachinePath)\Base\ws2022_DC_DE_21-03-2022-UEFI .vhdx" -ClientBasePath "$((get-vmhost).VirtualMachinePath)\Base\W11-PRO-22-3-2022-UEFI.vhdx"  -ConfigurationData $ConfigData -OutputPath "$((get-item env:userprofile).value)\Documents\GitHub\DSCLabCoen\dsc\hyperv" -VmPath "$((get-vmhost).VirtualMachinePath)"
     
