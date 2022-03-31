@@ -37,7 +37,7 @@ configuration xVMHyperV_Complete
     Import-DscResource -ModuleName 'xHyper-V'
     Import-DscResource -ModuleName 'PSDesiredStateConfiguration'
     
-
+    $maxmac = (get-vmhost | Select-Object MacAddressMaximum).tostring()
     Node 'Localhost'
     {
         # Logic to handle both Client and Server OS
