@@ -1,6 +1,12 @@
 ﻿Configuration TestDSC
 {
-    Import-DscResource -ModuleName PSDesiredStateConfiguration, ComputerManagementDsc, ActiveDirectoryDSC, NetworkingDsc, xDHCPServer, StorageDSC, Mario_cVSS, FileSystemDsc, cNtfsAccessControl, DFSDsc, cChoco, xRemoteDesktopAdmin
+    $modules = @("PSDesiredStateConfiguration", "ComputerManagementDsc", "ActiveDirectoryDSC", "NetworkingDsc", "xDHCPServer", "StorageDSC", "Mario_cVSS", "FileSystemDsc", "cNtfsAccessControl", "DFSDsc", "cChoco", "xRemoteDesktopAdmin")
+    foreach ($module in $modules) {
+        #if (-not(test-path "C:\Program Files\WindowsPowerShell\Modules\$module")) {
+            install-module $module -force
+        #}
+        #Import-Module -Name $module
+    }
 
     $Secure = ConvertTo-SecureString -String "$($ConfigurationData.Credential.LabPassword)" -AsPlainText -Force
     $credential = New-Object -typename Pscredential -ArgumentList Administrator, $secure

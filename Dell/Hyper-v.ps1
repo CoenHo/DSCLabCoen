@@ -37,7 +37,7 @@ configuration xVMHyperV_Complete
     Import-DscResource -ModuleName 'xHyper-V'
     Import-DscResource -ModuleName 'PSDesiredStateConfiguration'
     
-    $maxmac = (get-vmhost | Select-Object MacAddressMaximum).tostring()
+    
     Node 'Localhost'
     {
         # Logic to handle both Client and Server OS
@@ -50,6 +50,13 @@ configuration xVMHyperV_Complete
                 Ensure = 'Enable'
                 Name   = 'Microsoft-Hyper-V-All'
             }
+            xVMSwitch "LAB" {
+                Name = 'LAB'
+                Type = 'Private'
+                Ensure = 'Present'
+                DependsOn = $HyperVDependency
+            }
+            $extern = 'Default switch'
         }
         else {
             # Server OS, install HyperV as WindowsFeature
@@ -70,6 +77,13 @@ configuration xVMHyperV_Complete
                 Ensure = 'Present'
                 DependsOn = $HyperVDependency
             }
+            xVMSwitch "LAB" {
+                Name = 'LAB'
+                Type = 'Private'
+                Ensure = 'Present'
+                DependsOn = $HyperVDependency
+            }
+            $extern = 'Extern'
         }
 
         
@@ -140,7 +154,7 @@ configuration xVMHyperV_Complete
                 xVMNetworkAdapter MyVM01NIC {
                     Id         = 'WAN'
                     Name       = 'WAN'
-                    SwitchName = 'Extern'
+                    SwitchName = $extern
                     MacAddress = $ConfigData.Nodes.where{ $_.Name -eq $node }.macaddressex
                     VMName     = $_
                     Ensure     = 'Present'
@@ -170,7 +184,7 @@ configuration xVMHyperV_Complete
         
     }
 }
-
+$maxmac = (get-vmhost).MacAddressMaximum
 $ConfigData = @{
     AllNodes    = @(
         @{
@@ -180,30 +194,30 @@ $ConfigData = @{
         })
     Nodes       = @(@{
             Name       = 'D1-COEHODE2X'
-            MacAddress = '00155D02B2FF'
+            MacAddress = $maxmac
                 
         },
         @{
             Name       = 'DC2-COEHODE2X'
-            MacAddress = '00155D02B2FE'
+            MacAddress = $maxmac.replace("FF","FE")
                 
         },
         @{
             Name         = 'RTR-COEHODE2X'
-            MacAddress   = '00155D02B2FD'
-            MacAddressEx = '00155D02B2FC'
+            MacAddress   = $maxmac.replace("FF","FD")
+            MacAddressEx = $maxmac.replace("FF","FC")
               
         },
         @{
             Name       = 'CLT-COEHODE2X'
-            MacAddress = '00155D02B2FB'
+            MacAddress = $maxmac.replace("FF","FB")
               
         })
         
     
     NonNodeData = 
     @{
-        SwitchName               = "Extern"
+        SwitchName               = $extern
         SwitchNameNonPublic      = "LAB"
         StartUpMemory            = 1024Mb
         MinimumMemory            = 512Mb
