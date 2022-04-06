@@ -32,10 +32,10 @@
             Password             = $Credential
             PasswordNeverExpires = $true
         }
-        #TimeZone ChangeToEurope {
-        #    IsSingleInstance = 'Yes'
-        #    TimeZone         = 'W. Europe Standard Time'
-        #}
+        TimeZone ChangeToEurope {
+            IsSingleInstance = 'Yes'
+            TimeZone         = 'W. Europe Standard Time'
+        }
         NetAdapterName RenameLanAdapter {
             NewName    = 'LAB'
             MacAddress = "$($node.MacAddress)".insert(2, "-").insert(5, "-").insert(8, "-").insert(11, "-").insert(14, "-")
