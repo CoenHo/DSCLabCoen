@@ -1,11 +1,11 @@
 ﻿Configuration TestDSC
 {
-    $modules = @("PSDesiredStateConfiguration", "ComputerManagementDsc", "ActiveDirectoryDSC", "NetworkingDsc", "xDHCPServer", "StorageDSC", "Mario_cVSS", "FileSystemDsc", "cNtfsAccessControl", "DFSDsc", "cChoco", "xRemoteDesktopAdmin")
+    $modules = @("ComputerManagementDsc", "ActiveDirectoryDSC", "NetworkingDsc", "xDHCPServer", "StorageDSC", "Mario_cVSS", "FileSystemDsc", "cNtfsAccessControl", "DFSDsc", "cChoco", "xRemoteDesktopAdmin")
     foreach ($module in $modules) {
-        #if (-not(test-path "C:\Program Files\WindowsPowerShell\Modules\$module")) {
+        if (-not(test-path "C:\Program Files\PowerShell\Modules\$module")) {
             install-module $module -force
-        #}
-        #Import-Module -Name $module
+        }
+        Import-Module -Name $module
     }
 
     $Secure = ConvertTo-SecureString -String "$($ConfigurationData.Credential.LabPassword)" -AsPlainText -Force
@@ -253,7 +253,7 @@
             Name = 'RSAT'
             IncludeAllSubFeature = $true
         }
-        WaitForADDomain DscForestWait {
+        WaitForADDomain 'DscForestWait' {
             DomainName   = $DCData.DomainName
             Credential   = $DomainCredential
             RestartCount = '20'
@@ -341,16 +341,14 @@
     #region DomainJoin config
     node $AllNodes.Where( { $_.Role -eq 'domainJoin' }).NodeName 
     {
-        WaitForADDomain DscForestWait 
-        {
+        WaitForADDomain 'DscForestWait' {
             DomainName   = $DCData.DomainName
             Credential   = $DomainCredential
             RestartCount = '20'
             WaitTimeout  = '600'
         }
 
-        Computer JoinDC 
-        {
+        Computer JoinDC {
             Name       = $Node.NodeName
             DomainName = $DCData.DomainName
             Credential = $DomainCredential
@@ -1080,47 +1078,38 @@
     #region Software
     node $AllNodes.Where( { $_.Role -eq 'Software'}).Nodename
     {
-        cChocoInstaller installChoco
-  {
+        cChocoInstaller installChoco {
     InstallDir = "c:\ProgramData\chocolatey"
   }
-  cChocoPackageInstaller installvscode
-  {
+  cChocoPackageInstaller installvscode {
      Name = "vscode"
      DependsOn = "[cChocoInstaller]installChoco"
   }
-  cChocoPackageInstaller install7zip
-  {
+  cChocoPackageInstaller install7zip {
      Name = "7zip"
      DependsOn = "[cChocoInstaller]installChoco"
   }
-  cChocoPackageInstaller installpwsh
-  {
+  cChocoPackageInstaller installpwsh {
      Name = "pwsh"
      DependsOn = "[cChocoInstaller]installChoco"
   }
-  cChocoPackageInstaller installwt
-  {
+  cChocoPackageInstaller installwt {
      Name = "microsoft-windows-terminal"
      DependsOn = "[cChocoInstaller]installChoco"
   }
-  cChocoPackageInstaller installcascadia
-  {
+  cChocoPackageInstaller installcascadia {
      Name = "cascadiacode"
      DependsOn = "[cChocoInstaller]installChoco"
   }
-  cChocoPackageInstaller installcascadiapl
-  {
+  cChocoPackageInstaller installcascadiapl {
      Name = "cascadiacodepl"
      DependsOn = "[cChocoInstaller]installChoco"
   }
-  cChocoPackageInstaller installcascadiamono
-  {
+  cChocoPackageInstaller installcascadiamono {
      Name = "cascadiacodemono"
      DependsOn = "[cChocoInstaller]installChoco"
   }
-  cChocoPackageInstaller installmicrosoft-edge
-  {
+  cChocoPackageInstaller installmicrosoft-edge {
      Name = "microsoft-edge"
      DependsOn = "[cChocoInstaller]installChoco"
   }
@@ -1176,16 +1165,14 @@
             destinationPath = 'X:\data\eerste\public'
             Type = 'Directory'            
         }
-        SmbShare DFSSHare
-        {
+        SmbShare DFSSHare {
             Name = 'Public'
             Path = 'X:\data\eerste\public'
             FullAccess = 'Everyone'
             DependsOn = '[File]Dfs'
         }
         # Configure the namespace
-        DFSNamespaceRoot DFSNamespaceRoot_Domain_Software_POSHDC1
-        {
+        DFSNamespaceRoot DFSNamespaceRoot_Domain_Software_POSHDC1 {
             Path                 = "\\$($DCData.DomainName)\Public"
             TargetPath           = '\\poshdc1\Public'
             Ensure               = 'Present'
@@ -1197,8 +1184,7 @@
         
        
         # Configure the Replication Group
-        DFSReplicationGroup RGPublic
-        {
+        DFSReplicationGroup RGPublic {
             GroupName = 'Public'
             Description = 'Public files for use by all departments'
             Ensure = 'Present'
@@ -1209,8 +1195,7 @@
             
         } # End of RGPublic Resource
 
-        DFSReplicationGroupFolder RGSoftwareFolder
-        {
+        DFSReplicationGroupFolder RGSoftwareFolder {
             GroupName = 'Public'
             FolderName = 'Software'
             Description = 'DFS Share for storing software installers'
@@ -1219,8 +1204,7 @@
             DependsOn = '[DFSReplicationGroup]RGPublic'
         } # End of RGPublic Resource
 
-        DFSReplicationGroupMembership RGPublicSoftwareFS1
-        {
+        DFSReplicationGroupMembership RGPublicSoftwareFS1 {
             GroupName = 'Public'
             FolderName = 'Software'
             ComputerName = 'POSHDC1'
@@ -1230,8 +1214,7 @@
             DependsOn = '[DFSReplicationGroupFolder]RGSoftwareFolder'
         } # End of RGPublicSoftwareFS1 Resource
 
-        DFSReplicationGroupMembership RGPublicSoftwareFS2
-        {
+        DFSReplicationGroupMembership RGPublicSoftwareFS2 {
             GroupName = 'Public'
             FolderName = 'Software'
             ComputerName = 'FileServer2'
